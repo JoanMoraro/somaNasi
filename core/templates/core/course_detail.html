@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>{{ course.title }}</h1>
+<p class="text-muted">KES {{ course.price }}</p>
+<p>{{ course.description }}</p>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'enroll' course.id %}" class="btn btn-success mb-3">Enroll in this course</a>
+{% else %}
+    <a href="{% url 'login' %}" class="btn btn-outline-primary mb-3">Login to enroll</a>
+{% endif %}
+
+<h3>Lessons</h3>
+<ul class="list-group">
+{% for lesson in lessons %}
+    <li class="list-group-item">{{ lesson.title }}</li>
+{% empty %}
+    <li class="list-group-item">No lessons added yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}

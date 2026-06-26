@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>All Courses</h1>
+<div class="row">
+{% for course in courses %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.title }}</h5>
+                <p class="card-text">KES {{ course.price }}</p>
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-primary btn-sm">View Course</a>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <p>No courses available yet.</p>
+{% endfor %}
+</div>
+{% endblock %}
