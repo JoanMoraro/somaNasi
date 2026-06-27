@@ -10,10 +10,18 @@
     <a href="{% url 'login' %}" class="btn btn-outline-primary mb-3">Login to enroll</a>
 {% endif %}
 
-<h3>Lessons</h3>
+<div class="d-flex justify-content-between align-items-center">
+    <h3>Lessons</h3>
+    {% if user == course.instructor %}
+        <a href="{% url 'add_lesson' course.id %}" class="btn btn-sm btn-outline-primary">+ Add Lesson</a>
+    {% endif %}
+</div>
+
 <ul class="list-group">
 {% for lesson in lessons %}
-    <li class="list-group-item">{{ lesson.title }}</li>
+    <li class="list-group-item">
+        <a href="{% url 'lesson_detail' course.id lesson.id %}">{{ lesson.title }}</a>
+    </li>
 {% empty %}
     <li class="list-group-item">No lessons added yet.</li>
 {% endfor %}

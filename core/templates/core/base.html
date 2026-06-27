@@ -10,14 +10,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
     <a class="navbar-brand" href="{% url 'course_list' %}">somaNasi</a>
     <div class="ms-auto">
-        {% if user.is_authenticated %}
-            {% if user.profile.role == 'instructor' %}
-                <a class="btn btn-outline-light btn-sm me-2" href="{% url 'my_courses' %}">My Courses</a>
-            {% else %}
-                <a class="btn btn-outline-light btn-sm me-2" href="{% url 'my_enrollments' %}">My Enrollments</a>
-            {% endif %}
-            <a class="btn btn-outline-light btn-sm me-2" href="{% url 'logout' %}">Logout</a>
-        {% else %}
+{% if user.is_authenticated %}
+    <a class="btn btn-outline-light btn-sm me-2" href="{% url 'dashboard' %}">Dashboard</a>
+    <a class="btn btn-outline-light btn-sm me-2" href="{% url 'logout' %}">Logout</a>
+{% else %}
             <a class="btn btn-outline-light btn-sm me-2" href="{% url 'login' %}">Login</a>
             <a class="btn btn-light btn-sm" href="{% url 'signup' %}">Sign Up</a>
         {% endif %}
@@ -28,6 +24,10 @@
     {% block content %}
     {% endblock %}
 </div>
+
+<footer class="bg-dark text-light mt-5 py-3 text-center">
+    <p class="mb-0">&copy; {% now "Y" %} somaNasi. Built by Joan.</p>
+</footer>
 
 </body>
 </html>

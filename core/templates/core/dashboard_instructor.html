@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>Instructor Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ total_courses }}</h3>
+                <p class="text-muted">Courses Created</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ total_students }}</h3>
+                <p class="text-muted">Unique Students Enrolled</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <a href="{% url 'create_course' %}" class="btn btn-primary mt-2">+ Create New Course</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>Your Courses</h3>
+<div class="row">
+{% for course in courses %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.title }}</h5>
+                <p class="card-text">KES {{ course.price }}</p>
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-primary btn-sm">View</a>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <p>You haven't created any courses yet.</p>
+{% endfor %}
+</div>
+{% endblock %}

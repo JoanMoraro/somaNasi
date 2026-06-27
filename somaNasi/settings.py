@@ -119,4 +119,4 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-LOGIN_REDIRECT_URL = 'course_list'
+LOGIN_REDIRECT_URL = 'dashboard'

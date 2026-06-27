@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>My Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ total_enrolled }}</h3>
+                <p class="text-muted">Courses Enrolled</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3>{{ completed }}</h3>
+                <p class="text-muted">Completed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <a href="{% url 'course_list' %}" class="btn btn-primary mt-2">Browse Courses</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>My Enrollments</h3>
+<ul class="list-group">
+{% for enrollment in enrollments %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'course_detail' enrollment.course.id %}">{{ enrollment.course.title }}</a>
+        {% if enrollment.completed %}
+            <span class="badge bg-success">Completed</span>
+        {% else %}
+            <span class="badge bg-warning text-dark">In Progress</span>
+        {% endif %}
+    </li>
+{% empty %}
+    <li class="list-group-item">You haven't enrolled in any courses yet.</li>
+{% endfor %}
+</ul>
+{% endblock %}
