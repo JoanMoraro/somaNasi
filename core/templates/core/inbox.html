@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2>Inbox</h2>
+<div class="row">
+    <div class="col-md-8">
+        {% for message in messages %}
+        <div class="course-row">
+            <div>
+                <h6>{{ message.sender.username }} {% if message.course %}— {{ message.course.title }}{% endif %}</h6>
+                <p class="mb-1">{{ message.content }}</p>
+                <small class="text-muted">{{ message.sent_at|date:"d M Y, H:i" }}</small>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">No messages yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

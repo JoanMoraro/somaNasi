@@ -4,12 +4,19 @@
 <p class="text-muted">KES {{ course.price }}</p>
 <p>{{ course.description }}</p>
 
-{% if user.is_authenticated %}
+{% if user == course.instructor %}
+    <a href="{% url 'add_lesson' course.id %}" class="btn btn-dark mb-3">+ Add Lesson</a>
+
+{% elif user.is_authenticated and user.profile.role == 'student' %}
     <a href="{% url 'enroll' course.id %}" class="btn btn-success mb-3">Enroll in this course</a>
+    <a href="{% url 'send_message' course.instructor.id %}" class="btn btn-outline-dark btn-sm mb-3 ms-2">Message Instructor</a>
+
+{% elif user.is_authenticated and user.profile.role == 'instructor' %}
+    <p class="text-muted">You're viewing another instructor's course.</p>
+
 {% else %}
     <a href="{% url 'login' %}" class="btn btn-outline-primary mb-3">Login to enroll</a>
 {% endif %}
-
 <div class="d-flex justify-content-between align-items-center">
     <h3>Lessons</h3>
     {% if user == course.instructor %}

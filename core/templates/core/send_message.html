@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="greeting-card">
+            <h4>Message {{ recipient.username }}</h4>
+            <form method="post">
+                {% csrf_token %}
+                <textarea name="content" class="form-control mb-3" rows="4" placeholder="Write your message..." required></textarea>
+                <button type="submit" class="btn-dark-pill">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

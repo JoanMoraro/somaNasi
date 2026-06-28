@@ -2,7 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django import forms
-from .models import Course, Category, Enrollment, Lesson
+from .models import Course, Category, Enrollment, Lesson, Profile, Payment, Message
+from .mpesa import stk_push
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.models import User
 
 
 def course_list(request):
@@ -46,8 +50,31 @@ def signup(request):
 @login_required
 def enroll(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    Enrollment.objects.get_or_create(student=request.user, course=course)
-    return redirect('course_detail', course_id=course.id)
+
+    if course.price == 0:
+        Enrollment.objects.get_or_create(student=request.user, course=course)
+        return redirect('course_detail', course_id=course.id)
+
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        payment = Payment.objects.create(
+            student=request.user,
+            course=course,
+            phone_number=phone_number,
+            amount=course.price,
+            status='pending',
+        )
+        response = stk_push(
+            phone_number=phone_number,
+            amount=int(course.price),
+            account_reference=f"course-{course.id}",
+            transaction_desc=f"Payment for {course.title}",
+        )
+        payment.checkout_request_id = response.get('CheckoutRequestID', '')
+        payment.save()
+        return render(request, 'core/payment_pending.html', {'course': course})
+
+    return render(request, 'core/payment_form.html', {'course': course})
 
 
 class CourseForm(forms.ModelForm):
@@ -128,21 +155,91 @@ def add_lesson(request, course_id):
 
 @login_required
 def dashboard(request):
+    unread_count = Message.objects.filter(recipient=request.user, is_read=False).count()
+
     if request.user.profile.role == 'instructor':
         courses = Course.objects.filter(instructor=request.user)
         total_courses = courses.count()
         total_students = Enrollment.objects.filter(course__in=courses).values('student').distinct().count()
+        recent_enrollments = Enrollment.objects.filter(course__in=courses).order_by('-enrolled_at')[:5]
         return render(request, 'core/dashboard_instructor.html', {
             'courses': courses,
             'total_courses': total_courses,
             'total_students': total_students,
+            'notifications': recent_enrollments,
+            'unread_count': unread_count,
         })
     else:
         enrollments = Enrollment.objects.filter(student=request.user)
         total_enrolled = enrollments.count()
         completed = enrollments.filter(completed=True).count()
+        payments = Payment.objects.filter(student=request.user).order_by('-created_at')[:5]
         return render(request, 'core/dashboard_student.html', {
             'enrollments': enrollments,
             'total_enrolled': total_enrolled,
             'completed': completed,
+            'payments': payments,
+            'notifications': payments,
+            'unread_count': unread_count,
         })
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['bio']
+
+
+@login_required
+def profile_view(request):
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(request, 'core/profile.html', {'form': form, 'profile': profile})
+
+
+
+@login_required
+def settings_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('settings')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'core/settings.html', {'form': form})
+
+
+
+@login_required
+def inbox(request):
+    messages = Message.objects.filter(recipient=request.user)
+    messages.filter(is_read=False).update(is_read=True)
+    return render(request, 'core/inbox.html', {'messages': messages})
+
+
+@login_required
+def send_message(request, recipient_id):
+    recipient = get_object_or_404(User, id=recipient_id)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        course_id = request.POST.get('course_id')
+        course = Course.objects.filter(id=course_id).first() if course_id else None
+        Message.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            course=course,
+            content=content,
+        )
+        return redirect('inbox')
+
+    return render(request, 'core/send_message.html', {'recipient': recipient})
