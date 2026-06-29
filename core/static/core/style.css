@@ -23,8 +23,13 @@ body {
 .sidebar .brand {
     color: #fff;
     font-weight: 700;
-    font-size: 1.3rem;
+    font-style: italic;
+    font-size: 1.00rem;
+    letter-spacing: 0.5px;
     margin-bottom: 40px;
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 4px;
 }
 
 .sidebar a {

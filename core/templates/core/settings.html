@@ -1,16 +1,53 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
+
+<h2 class="mb-4">Settings</h2>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
         <div class="greeting-card">
-            <h4>Settings</h4>
-            <p class="text-muted">Change your password</p>
+            <h5 class="fw-bold mb-3">Account Information</h5>
+            <p class="text-muted mb-1">Username</p>
+            <p class="mb-3">{{ user.username }}</p>
+
+            <p class="text-muted mb-1">Email</p>
+            <p class="mb-3">{{ user.email|default:"Not set" }}</p>
+
+            <p class="text-muted mb-1">Role</p>
+            <p class="mb-0"><span class="badge bg-dark">{{ profile.role|capfirst }}</span></p>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="greeting-card">
+            <h5 class="fw-bold mb-3">Edit Bio</h5>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit:cover;">
+                {% endif %}
+
+                <label class="form-label fw-bold">Profile Photo</label>
+                {{ profile_form.avatar }}
+
+                <label class="form-label fw-bold mt-3">Bio</label>
+                {{ profile_form.bio }}
+                <button type="submit" name="update_profile" class="btn-dark-pill mt-3">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="greeting-card">
+            <h5 class="fw-bold mb-3">Change Password</h5>
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn-dark-pill mt-2">Update Password</button>
+                {{ password_form.as_p }}
+                <button type="submit" name="change_password" class="btn-dark-pill mt-2">Update Password</button>
             </form>
         </div>
     </div>
 </div>
+
 {% endblock %}

@@ -186,7 +186,7 @@ def dashboard(request):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['bio']
+        fields = ['bio', 'avatar']
 
 
 @login_required
@@ -207,16 +207,31 @@ def profile_view(request):
 
 @login_required
 def settings_view(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            return redirect('settings')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'core/settings.html', {'form': form})
+    profile = request.user.profile
 
+    if request.method == 'POST':
+        if 'update_profile' in request.POST:
+            profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+            password_form = PasswordChangeForm(request.user)
+            if profile_form.is_valid():
+                profile_form.save()
+                return redirect('settings')
+        elif 'change_password' in request.POST:
+            password_form = PasswordChangeForm(request.user, request.POST)
+            profile_form = ProfileForm(instance=profile)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                return redirect('settings')
+    else:
+        profile_form = ProfileForm(instance=profile)
+        password_form = PasswordChangeForm(request.user)
+
+    return render(request, 'core/settings.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'profile': profile,
+    })
 
 
 @login_required

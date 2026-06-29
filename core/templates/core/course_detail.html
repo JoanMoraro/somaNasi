@@ -5,17 +5,17 @@
 <p>{{ course.description }}</p>
 
 {% if user == course.instructor %}
-    <a href="{% url 'add_lesson' course.id %}" class="btn btn-dark mb-3">+ Add Lesson</a>
-
+    <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:4px 14px;">+ Add Lesson</a>
+{% endif %}
 {% elif user.is_authenticated and user.profile.role == 'student' %}
-    <a href="{% url 'enroll' course.id %}" class="btn btn-success mb-3">Enroll in this course</a>
-    <a href="{% url 'send_message' course.instructor.id %}" class="btn btn-outline-dark btn-sm mb-3 ms-2">Message Instructor</a>
+    <a href="{% url 'enroll' course.id %}" class="btn-dark-pill mb-3 d-inline-block">Enroll in this course</a>
+    <a href="{% url 'send_message' course.instructor.id %}" class="btn-dark-pill mb-3 d-inline-block ms-2" style="background:#fff; color:#1A1A1A; border:1px solid #1A1A1A;">Message Instructor</a>
 
 {% elif user.is_authenticated and user.profile.role == 'instructor' %}
     <p class="text-muted">You're viewing another instructor's course.</p>
 
 {% else %}
-    <a href="{% url 'login' %}" class="btn btn-outline-primary mb-3">Login to enroll</a>
+    <a href="{% url 'login' %}" class="btn-dark-pill mb-3 d-inline-block">Login to enroll</a>
 {% endif %}
 <div class="d-flex justify-content-between align-items-center">
     <h3>Lessons</h3>
