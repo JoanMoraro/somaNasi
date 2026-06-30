@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>somaNasi — Your Next Skill Starts Here</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bg-dark: #0F0B1E;
+            --card-dark: #1A1530;
+            --purple: #8B5CF6;
+            --purple-light: #A78BFA;
+            --text-muted: #9B95B5;
+        }
+        body {
+            background: var(--bg-dark);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .navbar-landing {
+            padding: 22px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-landing .brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .navbar-landing .brand .dot {
+            color: var(--purple-light);
+        }
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            margin: 0 14px;
+            font-size: 0.92rem;
+        }
+        .nav-links a:hover { color: #fff; }
+        .btn-purple {
+            background: linear-gradient(135deg, var(--purple), #6D28D9);
+            color: #fff;
+            border-radius: 30px;
+            padding: 10px 26px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            display: inline-block;
+        }
+        .btn-purple:hover { color: #fff; opacity: 0.9; }
+        .btn-ghost {
+            border: 1px solid #3A3550;
+            color: #fff;
+            border-radius: 30px;
+            padding: 10px 26px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .hero {
+            padding: 60px 50px 40px;
+        }
+        .hero .tag {
+            background: var(--card-dark);
+            border: 1px solid #3A3550;
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 0.8rem;
+            color: var(--purple-light);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+        .hero h1 .highlight { color: var(--purple-light); }
+        .hero p.lead-text {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 480px;
+            margin: 20px 0 30px;
+        }
+        .hero-visual {
+            background: radial-gradient(circle at 50% 50%, rgba(139,92,246,0.25), transparent 70%);
+            border-radius: 24px;
+            min-height: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+        }
+        .category-pill {
+            background: var(--card-dark);
+            border: 1px solid #2A2540;
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .category-pill:hover { border-color: var(--purple); }
+        .category-pill .icon { font-size: 1.6rem; margin-bottom: 8px; }
+        .category-pill h6 { font-weight: 700; margin-bottom: 2px; }
+        .category-pill small { color: var(--text-muted); }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .course-card {
+            background: var(--card-dark);
+            border: 1px solid #2A2540;
+            border-radius: 18px;
+            padding: 18px;
+            height: 100%;
+        }
+        .course-card .thumb {
+            height: 110px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6D28D9, #312E81);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 14px;
+        }
+        .course-card h6 { font-weight: 700; margin-bottom: 4px; }
+        .course-card small.muted { color: var(--text-muted); }
+
+        .stats-banner {
+            background: linear-gradient(135deg, #4C1D95, #312E81);
+            border-radius: 24px;
+            padding: 40px;
+        }
+        .stats-banner h2 { font-weight: 700; }
+        .stats-banner .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--purple-light); }
+        .stats-banner .stat-label { color: #ddd; font-size: 0.85rem; }
+
+        footer {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+            border-top: 1px solid #2A2540;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar-landing">
+    <div class="brand">somaNasi<span class="dot">.</span></div>
+    <div class="nav-links d-none d-md-block">
+        <a href="#">Home</a>
+        <a href="{% url 'course_list' %}">Courses</a>
+        <a href="#features">Features</a>
+        <a href="#instructors">Instructors</a>
+    </div>
+    <div>
+        <a href="{% url 'login' %}" class="btn-ghost me-2">Log in</a>
+        <a href="{% url 'signup' %}" class="btn-purple">Sign up</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row hero align-items-center">
+        <div class="col-md-6">
+            <span class="tag">✨ Learn. Build. Grow.</span>
+            <h1>Your Next Skill <br>Starts <span class="highlight">Here.</span></h1>
+            <p class="lead-text">somaNasi connects Kenyan learners with instructors teaching real, practical, job-ready skills — at your own pace.</p>
+            <a href="{% url 'course_list' %}" class="btn-purple me-2">Explore Courses</a>
+            <a href="{% url 'signup' %}" class="btn-ghost">Get Started</a>
+        </div>
+        <div class="col-md-6">
+            <div class="hero-visual">🎓💡</div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-5">
+        <div class="col-md-3 col-6">
+            <div class="category-pill">
+                <div class="icon">💻</div>
+                <h6>Programming</h6>
+                <small>{{ total_courses }} Courses</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="category-pill">
+                <div class="icon">🎨</div>
+                <h6>Design</h6>
+                <small>Explore</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="category-pill">
+                <div class="icon">📊</div>
+                <h6>Business</h6>
+                <small>Explore</small>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="category-pill">
+                <div class="icon">📈</div>
+                <h6>Marketing</h6>
+                <small>Explore</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="section-title">Featured Courses</h3>
+        <a href="{% url 'course_list' %}" class="text-decoration-none" style="color:var(--purple-light);">View all →</a>
+    </div>
+    <div class="row mb-5">
+        {% for course in featured_courses %}
+        <div class="col-md-4 mb-3">
+            <div class="course-card">
+                <div class="thumb">📘</div>
+                <h6>{{ course.title }}</h6>
+                <small class="muted">by {{ course.instructor.username }}</small>
+                <p class="mt-2 mb-3">KES {{ course.price }}</p>
+                <a href="{% url 'course_detail' course.id %}" class="btn-purple w-100 text-center" style="padding:8px;">View Course</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">No courses yet — check back soon!</p>
+        {% endfor %}
+    </div>
+
+    <div class="stats-banner mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2>Track your progress.<br>Get certified.</h2>
+                <p class="text-light opacity-75">Stay motivated with achievements and real, practical skills.</p>
+                <a href="{% url 'signup' %}" class="btn-purple">Start Learning Now</a>
+            </div>
+            <div class="col-md-6">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="stat-num">{{ total_students }}+</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="stat-num">{{ total_courses }}+</div>
+                        <div class="stat-label">Courses</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    &copy; {% now "Y" %} somaNasi. Built by Joan.
+</footer>
+
+</body>
+</html>

@@ -9,6 +9,20 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 
 
+
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    featured_courses = Course.objects.all()[:3]
+    total_courses = Course.objects.count()
+    total_students = Enrollment.objects.values('student').distinct().count()
+    return render(request, 'core/home.html', {
+        'featured_courses': featured_courses,
+        'total_courses': total_courses,
+        'total_students': total_students,
+    })
+
+
 def course_list(request):
     courses = Course.objects.all()
     categories = Category.objects.all()

@@ -6,40 +6,24 @@
         <i class="bi bi-search text-muted me-2"></i>
         <input type="text" name="q" placeholder="Search courses..." style="border:none;outline:none;background:transparent;width:100%;">
     </form>
-<div class="dropdown position-relative">
-    <i class="bi bi-bell" data-bs-toggle="dropdown" style="cursor:pointer;"></i>
-    {% if unread_count > 0 %}
-        <span class="badge bg-danger rounded-pill position-absolute" style="top:-6px; right:-8px; font-size:0.6rem;">{{ unread_count }}</span>
-    {% endif %}
-</div>
-    <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 260px;">
-        {% for note in notifications %}
-            <li class="px-2 py-1 small">
-                {% if note.status %}
+
+    <div class="dropdown position-relative">
+        <i class="bi bi-bell" data-bs-toggle="dropdown" style="cursor:pointer;"></i>
+        {% if unread_count > 0 %}
+            <span class="badge bg-danger rounded-pill position-absolute" style="top:-6px; right:-8px; font-size:0.6rem;">{{ unread_count }}</span>
+        {% endif %}
+        <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 260px;">
+            {% for note in notifications %}
+                <li class="px-2 py-1 small">
                     Payment for {{ note.course.title }}: <strong>{{ note.status }}</strong>
-                {% else %}
-                    {{ note.student.username }} enrolled in {{ note.course.title }}
-                {% endif %}``
-            </li>
-        {% empty %}
-            <li class="px-2 py-1 small text-muted">No notifications yet.</li>
-        {% endfor %}
-    </ul>
-</div>
-</div>
-    <div class="dropdown">
-    {% if user.profile.avatar %}
-    <img src="{{ user.profile.avatar.url }}" class="avatar" data-bs-toggle="dropdown" style="cursor:pointer; object-fit:cover;" width="38" height="38">
-{% else %}
-    <div class="avatar" data-bs-toggle="dropdown" style="cursor:pointer;">{{ user.username|slice:":1"|upper }}</div>
-{% endif %}
-    <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 180px;">
-        <li class="px-2 py-1 small text-muted">Signed in as <strong>{{ user.username }}</strong></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person-fill me-2"></i>View Profile</a></li>
-        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-    </ul>
-</div>
+                </li>
+            {% empty %}
+                <li class="px-2 py-1 small text-muted">No notifications yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
 </div>
 
 <div class="row">
@@ -67,6 +51,28 @@
         {% empty %}
         <p class="text-muted">You haven't enrolled in any courses yet. <a href="{% url 'course_list' %}">Browse courses</a></p>
         {% endfor %}
+
+        <h5 class="fw-bold mt-4 mb-3">Payment History</h5>
+        {% for payment in payments %}
+        <div class="course-row">
+            <div class="d-flex align-items-center">
+                <div class="course-icon"><i class="bi bi-cash-stack"></i></div>
+                <div>
+                    <h6>{{ payment.course.title }}</h6>
+                    <small>KES {{ payment.amount }} &middot; {{ payment.created_at|date:"d M Y, H:i" }}</small>
+                </div>
+            </div>
+            {% if payment.status == 'completed' %}
+                <span class="badge bg-success">Completed</span>
+            {% elif payment.status == 'failed' %}
+                <span class="badge bg-danger">Failed</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p class="text-muted">No payments yet.</p>
+        {% endfor %}
     </div>
 
     <div class="col-md-4">
@@ -93,8 +99,6 @@
         </div>
 
         <div class="premium-card text-center">
-
-        <div class="premium-card text-center">
             <h6>Learn even more!</h6>
             <p class="text-muted" style="font-size: 0.85rem;">Unlock premium features and grow faster.</p>
             <a href="#" class="btn-dark-pill">Go Premium</a>
@@ -103,7 +107,6 @@
 </div>
 
 {% endblock %}
-
 
 {% block extra_js %}
 <script>

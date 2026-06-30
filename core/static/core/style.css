@@ -1,46 +1,56 @@
 :root {
-    --dark-sidebar: #1A1A1A;
-    --light-bg: #F4F4F6;
-    --card-bg: #FFFFFF;
-    --accent: #1A1A1A;
+    --bg-dark: #0F0B1E;
+    --card-dark: #1A1530;
+    --card-dark-alt: #211B3D;
+    --purple: #8B5CF6;
+    --purple-light: #A78BFA;
+    --purple-deep: #6D28D9;
+    --text-muted: #9B95B5;
+    --border-dark: #2A2540;
 }
 
 body {
-    background-color: var(--light-bg);
+    background-color: var(--bg-dark);
+    color: #fff;
 }
 
-/* Icon sidebar */
+/* Sidebar */
 .sidebar {
-    background-color: var(--dark-sidebar);
-    width: 80px;
+    background-color: var(--card-dark);
+    width: 100px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
+    border-right: 1px solid var(--border-dark);
 }
 
 .sidebar .brand {
     color: #fff;
     font-weight: 700;
-    font-style: italic;
-    font-size: 1.00rem;
-    letter-spacing: 0.5px;
+    font-size: 0.95rem;
     margin-bottom: 40px;
     text-align: center;
-    line-height: 1.2;
-    padding: 0 4px;
+    padding: 0 8px;
 }
 
 .sidebar a {
-    color: #888;
+    color: var(--text-muted);
     font-size: 1.3rem;
-    margin-bottom: 28px;
+    margin-bottom: 22px;
     text-decoration: none;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
 }
 
 .sidebar a:hover, .sidebar a.active {
     color: #fff;
+    background: linear-gradient(135deg, var(--purple), var(--purple-deep));
 }
 
 .sidebar .logout-icon {
@@ -62,18 +72,32 @@ body {
 }
 
 .topbar .search-box {
-    background: #fff;
+    background: var(--card-dark);
+    border: 1px solid var(--border-dark);
     border-radius: 30px;
     padding: 8px 18px;
     width: 280px;
-    border: 1px solid #eee;
+    color: #fff;
+}
+
+.topbar .search-box input {
+    color: #fff !important;
+}
+
+.topbar .search-box input::placeholder {
+    color: var(--text-muted);
+}
+
+.topbar i.bi-bell {
+    color: var(--text-muted);
+    font-size: 1.2rem;
 }
 
 .topbar .avatar {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: var(--dark-sidebar);
+    background: linear-gradient(135deg, var(--purple), var(--purple-deep));
     color: #fff;
     display: flex;
     align-items: center;
@@ -81,40 +105,55 @@ body {
     font-weight: 600;
 }
 
-/* Greeting card */
+.dropdown-menu {
+    background: var(--card-dark);
+    border: 1px solid var(--border-dark);
+}
+
+.dropdown-item, .dropdown-menu li, .dropdown-menu .small {
+    color: #ddd !important;
+}
+
+.dropdown-item:hover {
+    background: var(--card-dark-alt);
+    color: #fff !important;
+}
+
+.dropdown-divider {
+    border-color: var(--border-dark);
+}
+
+/* Greeting / generic cards */
+.greeting-card, .stat-card, .premium-card, .course-row {
+    background: var(--card-dark);
+    border: 1px solid var(--border-dark);
+}
+
 .greeting-card {
-    background: #fff;
     border-radius: 20px;
     padding: 25px 30px;
     margin-bottom: 20px;
 }
 
-.greeting-card h3 {
-    font-weight: 700;
-    margin-bottom: 4px;
-}
+.greeting-card h3 { font-weight: 700; margin-bottom: 4px; color: #fff; }
 
-/* Stat cards */
 .stat-card {
-    background: #fff;
     border-radius: 18px;
     padding: 20px;
-    text-align: center;
 }
 
 .stat-card .stat-number {
     font-size: 1.8rem;
     font-weight: 700;
+    color: var(--purple-light);
 }
 
-.stat-card .stat-label {
-    color: #888;
+.stat-card .stat-label, .stat-card small {
+    color: var(--text-muted) !important;
     font-size: 0.85rem;
 }
 
-/* Course list rows */
 .course-row {
-    background: #fff;
     border-radius: 14px;
     padding: 14px 20px;
     margin-bottom: 12px;
@@ -127,7 +166,7 @@ body {
     width: 42px;
     height: 42px;
     border-radius: 10px;
-    background: var(--dark-sidebar);
+    background: linear-gradient(135deg, var(--purple), var(--purple-deep));
     color: #fff;
     display: flex;
     align-items: center;
@@ -135,17 +174,11 @@ body {
     margin-right: 14px;
 }
 
-.course-row h6 {
-    margin-bottom: 0;
-    font-weight: 600;
-}
-
-.course-row small {
-    color: #888;
-}
+.course-row h6 { margin-bottom: 0; font-weight: 600; color: #fff; }
+.course-row small { color: var(--text-muted); }
 
 .btn-dark-pill {
-    background: var(--dark-sidebar);
+    background: linear-gradient(135deg, var(--purple), var(--purple-deep));
     color: #fff;
     border-radius: 30px;
     padding: 6px 18px;
@@ -154,27 +187,63 @@ body {
     text-decoration: none;
 }
 
-.btn-dark-pill:hover {
-    background: #333;
-    color: #fff;
-}
+.btn-dark-pill:hover { color: #fff; opacity: 0.9; }
 
-/* Premium card */
 .premium-card {
-    background: #fff;
     border-radius: 18px;
     padding: 20px;
 }
 
-.premium-card h6 {
-    font-weight: 700;
+.premium-card h6 { font-weight: 700; color: #fff; }
+.premium-card p { color: var(--text-muted); }
+
+/* Journey / progress card */
+.journey-card {
+    background: linear-gradient(135deg, #4C1D95, #312E81);
+    border-radius: 18px;
+    padding: 22px;
+    color: #fff;
 }
 
+.journey-card .percent { font-size: 2rem; font-weight: 800; }
 
-textarea {
-    width: 100%;
+.progress-bar-track {
+    background: rgba(255,255,255,0.15);
+    border-radius: 30px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: var(--purple-light);
+    height: 100%;
+    border-radius: 30px;
+}
+
+/* Achievement / mission list */
+.mission-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    color: #ddd;
+    font-size: 0.9rem;
+}
+
+.mission-item i.done { color: #34D399; }
+
+textarea, input[type="text"], input[type="password"], input[type="email"] {
+    background: var(--card-dark-alt) !important;
+    color: #fff !important;
+    border: 1px solid var(--border-dark) !important;
     border-radius: 12px;
-    border: 1px solid #eee;
     padding: 10px;
-    margin-top: 6px;
 }
+
+textarea { width: 100%; margin-top: 6px; }
+
+label { color: #ddd !important; }
+
+.badge.bg-dark { background: var(--card-dark-alt) !important; }
+
+a { color: var(--purple-light); }
