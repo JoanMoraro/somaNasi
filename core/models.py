@@ -50,21 +50,34 @@ class Enrollment(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_enrollments')
     enrolled_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
+    progress = models.PositiveIntegerField(default=0)
     
     class Meta:
         unique_together = ('student', 'course')
         
     def __str__(self):
         return f"{self.student.username} -> {self.course.title}"
-        
-        
-        
 
+
+class StudentProgress(models.Model):
+    student = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_progress')
+    xp = models.PositiveIntegerField(default=0)
+    streak = models.PositiveIntegerField(default=0)
+    last_active = models.DateField(null=True, blank=True)
+    badges = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.student.username} — {self.xp} XP"
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance) 
+        Profile.objects.create(user=instance)
+        StudentProgress.objects.create(student=instance)   
         
         
         

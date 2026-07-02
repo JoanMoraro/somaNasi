@@ -36,6 +36,40 @@
             <div style="font-size: 2.5rem;">👋</div>
         </div>
 
+            <div class="row mb-3">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card">
+            <div style="font-size:1.5rem;">⚡</div>
+            <div class="stat-number">{{ xp }}</div>
+            <div class="stat-label">XP Earned</div>
+            <small style="color:#34D399;">Keep learning to earn more!</small>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card">
+            <div style="font-size:1.5rem;">🔥</div>
+            <div class="stat-number">{{ streak }}</div>
+            <div class="stat-label">Day Streak</div>
+            <small style="color:#FBBF24;">Keep it up!</small>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card">
+            <div style="font-size:1.5rem;">📚</div>
+            <div class="stat-number">{{ total_enrolled }}</div>
+            <div class="stat-label">Courses Enrolled</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card">
+            <div style="font-size:1.5rem;">🏆</div>
+            <div class="stat-number">{{ badges }}</div>
+            <div class="stat-label">Badges Earned</div>
+        </div>
+    </div>
+</div>
+</div>
+
         <h5 class="fw-bold mt-4 mb-3">Courses</h5>
         {% for enrollment in enrollments %}
         <div class="course-row">
@@ -75,36 +109,7 @@
         {% endfor %}
     </div>
 
-    <div class="col-md-4">
-        <div class="row mb-3">
-            <div class="col-6">
-                <div class="stat-card">
-                    <div class="stat-number">{{ completed }}</div>
-                    <div class="stat-label">Courses completed</div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="stat-card">
-                    <div class="stat-number">{{ total_enrolled }}</div>
-                    <div class="stat-label">Courses enrolled</div>
-                </div>
-            </div>
-        </div>
 
-        <div class="stat-card mb-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="fw-bold mb-0" style="text-align:left;">Your statistics</h6>
-            </div>
-            <canvas id="statsChart" height="160"></canvas>
-        </div>
-
-        <div class="premium-card text-center">
-            <h6>Learn even more!</h6>
-            <p class="text-muted" style="font-size: 0.85rem;">Unlock premium features and grow faster.</p>
-            <a href="#" class="btn-dark-pill">Go Premium</a>
-        </div>
-    </div>
-</div>
 
 {% endblock %}
 

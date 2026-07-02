@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django import forms
-from .models import Course, Category, Enrollment, Lesson, Profile, Payment, Message
+from .models import Course, Category, Enrollment, Lesson, Profile, Payment, Message, StudentProgress
 from .mpesa import stk_push
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -188,6 +188,7 @@ def dashboard(request):
         total_enrolled = enrollments.count()
         completed = enrollments.filter(completed=True).count()
         payments = Payment.objects.filter(student=request.user).order_by('-created_at')[:5]
+        progress, _ = StudentProgress.objects.get_or_create(student=request.user)
         return render(request, 'core/dashboard_student.html', {
             'enrollments': enrollments,
             'total_enrolled': total_enrolled,
@@ -195,6 +196,9 @@ def dashboard(request):
             'payments': payments,
             'notifications': payments,
             'unread_count': unread_count,
+            'xp': progress.xp,
+            'streak': progress.streak,
+            'badges': progress.badges,
         })
 
 class ProfileForm(forms.ModelForm):
