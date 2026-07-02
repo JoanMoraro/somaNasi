@@ -17,35 +17,54 @@ body {
 /* Sidebar */
 .sidebar {
     background-color: var(--card-dark);
-    width: 100px;
+    width: 220px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
+    align-items: flex-start;
+    padding: 24px 16px;
     border-right: 1px solid var(--border-dark);
 }
 
 .sidebar .brand {
     color: #fff;
     font-weight: 700;
-    font-size: 0.95rem;
-    margin-bottom: 40px;
-    text-align: center;
-    padding: 0 8px;
+    font-size: 1.1rem;
+    margin-bottom: 36px;
+    padding-left: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar .brand .dot {
+    color: var(--purple-light);
+}
+
+.sidebar .nav-section {
+    width: 100%;
+    margin-bottom: 6px;
 }
 
 .sidebar a {
     color: var(--text-muted);
-    font-size: 1.3rem;
-    margin-bottom: 22px;
+    font-size: 0.88rem;
     text-decoration: none;
-    width: 44px;
-    height: 44px;
+    width: 100%;
+    height: 42px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 12px;
     border-radius: 12px;
+    padding: 0 12px;
+    margin-bottom: 4px;
+    transition: all 0.15s;
+}
+
+.sidebar a i {
+    font-size: 1rem;
+    width: 18px;
+    text-align: center;
 }
 
 .sidebar a:hover, .sidebar a.active {
@@ -55,9 +74,19 @@ body {
 
 .sidebar .logout-icon {
     margin-top: auto;
-    margin-bottom: 20px;
+    width: 100%;
 }
 
+.sidebar .dark-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: auto;
+    width: 100%;
+}
 .main-content {
     padding: 30px 40px;
 }
@@ -247,3 +276,12 @@ label { color: #ddd !important; }
 .badge.bg-dark { background: var(--card-dark-alt) !important; }
 
 a { color: var(--purple-light); }
+
+
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}

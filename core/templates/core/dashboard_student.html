@@ -1,103 +1,250 @@
 {% extends 'core/base.html' %}
 {% block content %}
 
+<!-- Topbar -->
 <div class="topbar">
     <form action="{% url 'course_list' %}" method="get" class="search-box d-flex align-items-center">
-        <i class="bi bi-search text-muted me-2"></i>
-        <input type="text" name="q" placeholder="Search courses..." style="border:none;outline:none;background:transparent;width:100%;">
+        <i class="bi bi-search me-2" style="color:var(--text-muted);"></i>
+        <input type="text" name="q" placeholder="Search courses..." style="border:none;outline:none;background:transparent;width:100%;color:#fff;">
     </form>
-
     <div class="dropdown position-relative">
-        <i class="bi bi-bell" data-bs-toggle="dropdown" style="cursor:pointer;"></i>
+        <i class="bi bi-bell" data-bs-toggle="dropdown" style="cursor:pointer; color:#fff; font-size:1.2rem;"></i>
         {% if unread_count > 0 %}
-            <span class="badge bg-danger rounded-pill position-absolute" style="top:-6px; right:-8px; font-size:0.6rem;">{{ unread_count }}</span>
+            <span class="badge bg-danger rounded-pill position-absolute" style="top:-6px;right:-8px;font-size:0.6rem;">{{ unread_count }}</span>
         {% endif %}
-        <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 260px;">
+        <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width:260px;">
             {% for note in notifications %}
-                <li class="px-2 py-1 small">
-                    Payment for {{ note.course.title }}: <strong>{{ note.status }}</strong>
-                </li>
+                <li class="px-2 py-1 small">Payment for {{ note.course.title }}: <strong>{{ note.status }}</strong></li>
             {% empty %}
-                <li class="px-2 py-1 small text-muted">No notifications yet.</li>
+                <li class="px-2 py-1 small" style="color:var(--text-muted);">No notifications yet.</li>
             {% endfor %}
         </ul>
     </div>
-
-    <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
-</div>
-
-<div class="row">
-    <div class="col-md-8">
-        <div class="greeting-card d-flex justify-content-between align-items-center">
-            <div>
-                <h3>Hello {{ user.first_name|default:user.username }}!</h3>
-                <p class="text-muted mb-0">It's good to see you again.</p>
-            </div>
-            <div style="font-size: 2.5rem;">👋</div>
-        </div>
-
-            <div class="row mb-3">
-    <div class="col-md-3 col-6 mb-3">
-        <div class="stat-card">
-            <div style="font-size:1.5rem;">⚡</div>
-            <div class="stat-number">{{ xp }}</div>
-            <div class="stat-label">XP Earned</div>
-            <small style="color:#34D399;">Keep learning to earn more!</small>
-        </div>
-    </div>
-    <div class="col-md-3 col-6 mb-3">
-        <div class="stat-card">
-            <div style="font-size:1.5rem;">🔥</div>
-            <div class="stat-number">{{ streak }}</div>
-            <div class="stat-label">Day Streak</div>
-            <small style="color:#FBBF24;">Keep it up!</small>
-        </div>
-    </div>
-    <div class="col-md-3 col-6 mb-3">
-        <div class="stat-card">
-            <div style="font-size:1.5rem;">📚</div>
-            <div class="stat-number">{{ total_enrolled }}</div>
-            <div class="stat-label">Courses Enrolled</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-6 mb-3">
-        <div class="stat-card">
-            <div style="font-size:1.5rem;">🏆</div>
-            <div class="stat-number">{{ badges }}</div>
-            <div class="stat-label">Badges Earned</div>
-        </div>
+    <div class="dropdown">
+        {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" class="avatar" data-bs-toggle="dropdown" style="cursor:pointer;object-fit:cover;" width="38" height="38">
+        {% else %}
+            <div class="avatar" data-bs-toggle="dropdown" style="cursor:pointer;">{{ user.username|slice:":1"|upper }}</div>
+        {% endif %}
+        <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width:180px;">
+            <li class="px-2 py-1 small">Signed in as <strong>{{ user.username }}</strong></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person-fill me-2"></i>View Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+        </ul>
     </div>
 </div>
+
+<!-- Welcome -->
+<div class="mb-4">
+    <h3 style="font-weight:700;">Welcome back, {{ user.first_name|default:user.username }}! 👋</h3>
+    <p style="color:var(--text-muted); margin:0;">Keep going! You're doing great.</p>
 </div>
 
-        <h5 class="fw-bold mt-4 mb-3">Courses</h5>
-        {% for enrollment in enrollments %}
-        <div class="course-row">
-            <div class="d-flex align-items-center">
-                <div class="course-icon"><i class="bi bi-book-fill"></i></div>
+<!-- Stat Cards Row -->
+<div class="row mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card" style="min-height:110px;">
+            <div class="d-flex justify-content-between align-items-start w-100">
                 <div>
-                    <h6>{{ enrollment.course.title }}</h6>
-                    <small>by {{ enrollment.course.instructor.username }}</small>
+                    <div style="color:var(--text-muted); font-size:0.78rem; margin-bottom:6px;">XP Earned</div>
+                    <div style="font-size:1.6rem; font-weight:800; color:#fff;">{{ xp }} XP</div>
+                    <div style="color:#34D399; font-size:0.75rem;">+320 this week</div>
+                </div>
+                <div style="font-size:2rem;">⚡</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card" style="min-height:110px;">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.78rem; margin-bottom:6px;">Learning Streak</div>
+                    <div style="font-size:1.6rem; font-weight:800; color:#fff;">{{ streak }} Days</div>
+                    <div style="color:#F59E0B; font-size:0.75rem;">🔥 Keep it up!</div>
+                </div>
+                <div style="font-size:2rem;">🔥</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card" style="min-height:110px;">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.78rem; margin-bottom:6px;">Courses Enrolled</div>
+                    <div style="font-size:1.6rem; font-weight:800; color:#fff;">{{ total_enrolled }}</div>
+                    <div style="color:var(--text-muted); font-size:0.75rem;">{{ completed }} completed</div>
+                </div>
+                <div style="font-size:2rem;">📚</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="stat-card" style="min-height:110px;">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.78rem; margin-bottom:6px;">Achievements</div>
+                    <div style="font-size:1.6rem; font-weight:800; color:#fff;">{{ badges }}</div>
+                    <div style="color:var(--text-muted); font-size:0.75rem;">Badges Earned</div>
+                </div>
+                <div style="font-size:2rem;">🏆</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Middle Row: Journey + Daily Mission + Streak Calendar -->
+<div class="row mb-4">
+    <!-- Learning Journey -->
+    <div class="col-md-5 mb-3">
+        <div class="stat-card h-100" style="background:linear-gradient(135deg,#2D1B69,#1E1B4B); border:none; padding:24px;">
+            <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:8px;">Your Learning Journey</div>
+            <div style="font-size:2.5rem; font-weight:800; color:#fff;">
+                {% if total_enrolled > 0 %}{% widthratio completed total_enrolled 100 %}{% else %}0{% endif %}%
+            </div>
+            <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:16px;">Courses completed so far</div>
+
+            <!-- Mountain SVG -->
+            <svg viewBox="0 0 300 120" style="width:100%; margin-bottom:16px;">
+                <defs>
+                    <linearGradient id="mtGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#4C1D95;stop-opacity:1"/>
+                        <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1"/>
+                    </linearGradient>
+                </defs>
+                <polygon points="30,110 150,10 270,110" fill="url(#mtGrad)" opacity="0.9"/>
+                <polygon points="0,110 80,50 160,110" fill="#312E81" opacity="0.7"/>
+                <circle cx="150" cy="10" r="5" fill="#A78BFA"/>
+                <polyline points="20,100 70,70 110,80 150,10" stroke="#A78BFA" stroke-width="2" fill="none"/>
+                <circle cx="20" cy="100" r="3" fill="#A78BFA"/>
+                <circle cx="70" cy="70" r="3" fill="#A78BFA"/>
+                <circle cx="110" cy="80" r="3" fill="#A78BFA"/>
+            </svg>
+
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width:{% if total_enrolled > 0 %}{% widthratio completed total_enrolled 100 %}{% else %}0{% endif %}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Mission -->
+    <div class="col-md-4 mb-3">
+        <div class="stat-card h-100" style="padding:24px;">
+            <div style="font-weight:700; font-size:1rem; margin-bottom:16px;">Daily Mission</div>
+            <div class="mission-item">
+                <i class="bi bi-check-circle-fill done"></i>
+                Watch a lesson today
+            </div>
+            <div class="mission-item">
+                <i class="bi bi-check-circle-fill done"></i>
+                Complete a course section
+            </div>
+            <div class="mission-item" style="color:var(--text-muted);">
+                <i class="bi bi-circle" style="color:var(--text-muted);"></i>
+                Enroll in a new course
+            </div>
+            <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border-dark);">
+                <span style="color:var(--purple-light); font-weight:700;">+320 XP</span>
+                <span style="font-size:1.2rem; margin-left:8px;">🎁</span>
+                <div class="progress-bar-track mt-2">
+                    <div class="progress-bar-fill" style="width:66%;"></div>
                 </div>
             </div>
-            <a href="{% url 'course_detail' enrollment.course.id %}" class="btn-dark-pill">View course</a>
+        </div>
+    </div>
+
+    <!-- Streak Calendar -->
+    <div class="col-md-3 mb-3">
+        <div class="stat-card h-100" style="padding:24px;">
+            <div style="font-weight:700; font-size:1rem; margin-bottom:16px;">Streak Calendar</div>
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center;">
+                <div style="color:var(--text-muted); font-size:0.6rem;">M</div>
+                <div style="color:var(--text-muted); font-size:0.6rem;">T</div>
+                <div style="color:var(--text-muted); font-size:0.6rem;">W</div>
+                <div style="color:var(--text-muted); font-size:0.6rem;">T</div>
+                <div style="color:var(--text-muted); font-size:0.6rem;">F</div>
+                <div style="color:var(--text-muted); font-size:0.6rem;">S</div>
+                <div style="color:var(--text-muted); font-size:0.6rem;">S</div>
+                {% for i in "1234567890123456789012345678" %}
+                    <div style="width:100%; aspect-ratio:1; border-radius:3px; background:{% cycle '#34D399' '#34D399' '#34D399' '#34D399' '#34D399' 'var(--border-dark)' '#34D399' '#34D399' '#34D399' 'var(--border-dark)' '#34D399' '#34D399' '#34D399' '#34D399' '#34D399' '#34D399' 'var(--border-dark)' '#34D399' '#34D399' '#34D399' '#34D399' 'var(--border-dark)' '#34D399' 'var(--border-dark)' 'var(--border-dark)' 'var(--border-dark)' 'var(--border-dark)' 'var(--border-dark)' %};"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Row: Continue Learning + Recent Achievements -->
+<div class="row">
+    <!-- Continue Learning -->
+    <div class="col-md-7 mb-3">
+        <div style="font-weight:700; font-size:1rem; margin-bottom:14px;">Continue Learning</div>
+        {% for enrollment in enrollments %}
+        <div class="course-row mb-2" style="flex-direction:column; align-items:flex-start; padding:16px 20px;">
+            <div class="d-flex align-items-center justify-content-between w-100 mb-2">
+                <div class="d-flex align-items-center">
+                    <div class="course-icon me-3"><i class="bi bi-book-fill"></i></div>
+                    <div>
+                        <h6 style="margin:0; font-size:0.9rem;">{{ enrollment.course.title }}</h6>
+                        <small style="color:var(--text-muted);">by {{ enrollment.course.instructor.username }}</small>
+                    </div>
+                </div>
+                <a href="{% url 'course_detail' enrollment.course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 16px;">Continue</a>
+            </div>
+            <div class="w-100">
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width:{{ enrollment.progress }}%;"></div>
+                </div>
+                <small style="color:var(--text-muted);">{{ enrollment.progress }}% complete</small>
+            </div>
         </div>
         {% empty %}
-        <p class="text-muted">You haven't enrolled in any courses yet. <a href="{% url 'course_list' %}">Browse courses</a></p>
+        <div class="stat-card text-center py-4">
+            <p style="color:var(--text-muted);">No courses yet.</p>
+            <a href="{% url 'course_list' %}" class="btn-dark-pill">Browse Courses</a>
+        </div>
         {% endfor %}
+    </div>
 
-        <h5 class="fw-bold mt-4 mb-3">Payment History</h5>
-        {% for payment in payments %}
-        <div class="course-row">
-            <div class="d-flex align-items-center">
-                <div class="course-icon"><i class="bi bi-cash-stack"></i></div>
+    <!-- Recent Achievements -->
+    <div class="col-md-5 mb-3">
+        <div style="font-weight:700; font-size:1rem; margin-bottom:14px;">Recent Achievements</div>
+        <div class="stat-card" style="padding:20px;">
+            <div class="d-flex align-items-center mb-3 pb-3" style="border-bottom:1px solid var(--border-dark);">
+                <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#EF4444,#DC2626); display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-right:14px;">🐦</div>
                 <div>
-                    <h6>{{ payment.course.title }}</h6>
-                    <small>KES {{ payment.amount }} &middot; {{ payment.created_at|date:"d M Y, H:i" }}</small>
+                    <div style="font-weight:700; font-size:0.9rem;">Early Bird</div>
+                    <div style="color:var(--text-muted); font-size:0.78rem;">Logged in 7 days in a row</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-3 pb-3" style="border-bottom:1px solid var(--border-dark);">
+                <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#8B5CF6,#6D28D9); display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-right:14px;">🧠</div>
+                <div>
+                    <div style="font-weight:700; font-size:0.9rem;">Quiz Master</div>
+                    <div style="color:var(--text-muted); font-size:0.78rem;">Scored 100% in a lesson</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#3B82F6,#1D4ED8); display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-right:14px;">🛡️</div>
+                <div>
+                    <div style="font-weight:700; font-size:0.9rem;">Consistent Learner</div>
+                    <div style="color:var(--text-muted); font-size:0.78rem;">Completed 10 lessons</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div style="font-weight:700; font-size:1rem; margin:20px 0 14px;">Payment History</div>
+        {% for payment in payments %}
+        <div class="course-row mb-2">
+            <div class="d-flex align-items-center">
+                <div class="course-icon me-3"><i class="bi bi-cash-stack"></i></div>
+                <div>
+                    <h6 style="margin:0; font-size:0.85rem;">{{ payment.course.title }}</h6>
+                    <small style="color:var(--text-muted);">KES {{ payment.amount }} &middot; {{ payment.created_at|date:"d M Y" }}</small>
                 </div>
             </div>
             {% if payment.status == 'completed' %}
-                <span class="badge bg-success">Completed</span>
+                <span class="badge bg-success">Paid</span>
             {% elif payment.status == 'failed' %}
                 <span class="badge bg-danger">Failed</span>
             {% else %}
@@ -105,38 +252,14 @@
             {% endif %}
         </div>
         {% empty %}
-        <p class="text-muted">No payments yet.</p>
+        <p style="color:var(--text-muted); font-size:0.85rem;">No payments yet.</p>
         {% endfor %}
     </div>
-
-
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script>
-const ctx = document.getElementById('statsChart');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-            label: 'Learning Hours',
-            data: [0, 1.5, 1, 2.5, 4, 3, 2],
-            borderColor: '#1A1A1A',
-            backgroundColor: 'rgba(26,26,26,0.05)',
-            tension: 0.4,
-            fill: true,
-            pointBackgroundColor: '#1A1A1A',
-        }]
-    },
-    options: {
-        plugins: { legend: { display: false } },
-        scales: {
-            y: { beginAtZero: true, grid: { display: false } },
-            x: { grid: { display: false } }
-        }
-    }
-});
 </script>
 {% endblock %}
