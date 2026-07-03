@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Profile, Course, Lesson, Enrollment, Payment, Message, StudentProgress
+from .models import Category, Profile, Course, Lesson, Enrollment, Payment, Message, StudentProgress, Assignment, AssignmentSubmission
 
 
 admin.site.register(Category)
@@ -10,4 +10,6 @@ admin.site.register(Enrollment)
 admin.site.register(Payment)
 admin.site.register(Message)
 admin.site.register(StudentProgress)
+admin.site.register(Assignment)
+admin.site.register(AssignmentSubmission)
 
