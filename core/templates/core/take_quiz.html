@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="mb-4">
+            <h3 style="font-weight:700;">{{ quiz.title }}</h3>
+            <p style="color:var(--text-muted);">{{ quiz.course.title }} &middot; {{ questions|length }} questions</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {% for question in questions %}
+            <div class="stat-card mb-3" style="padding:24px;">
+                <p style="color:#fff; font-weight:600; margin-bottom:16px;">{{ forloop.counter }}. {{ question.text }}</p>
+                {% for option, label in question.option_a,question.option_b,question.option_c,question.option_d %}
+                {% endfor %}
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#ddd; padding:10px; border:1px solid var(--border-dark); border-radius:10px;">
+                        <input type="radio" name="question_{{ question.id }}" value="a" required> {{ question.option_a }}
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#ddd; padding:10px; border:1px solid var(--border-dark); border-radius:10px;">
+                        <input type="radio" name="question_{{ question.id }}" value="b"> {{ question.option_b }}
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#ddd; padding:10px; border:1px solid var(--border-dark); border-radius:10px;">
+                        <input type="radio" name="question_{{ question.id }}" value="c"> {{ question.option_c }}
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#ddd; padding:10px; border:1px solid var(--border-dark); border-radius:10px;">
+                        <input type="radio" name="question_{{ question.id }}" value="d"> {{ question.option_d }}
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-dark-pill w-100 text-center" style="padding:12px;">Submit Quiz</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

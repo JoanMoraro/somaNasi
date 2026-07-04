@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django import forms
-from .models import Course, Category, Enrollment, Lesson, Profile, Payment, Message, StudentProgress
+from .models import Course, Category, Enrollment, Lesson, Profile, Payment, Message, StudentProgress, Assignment, AssignmentSubmission, Quiz, Question, QuizResult, Certificate, Achievement
 from .mpesa import stk_push
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -226,6 +226,7 @@ def profile_view(request):
 @login_required
 def settings_view(request):
     profile = request.user.profile
+    progress, _ = StudentProgress.objects.get_or_create(student=request.user)
 
     if request.method == 'POST':
         if 'update_profile' in request.POST:
@@ -233,6 +234,9 @@ def settings_view(request):
             password_form = PasswordChangeForm(request.user)
             if profile_form.is_valid():
                 profile_form.save()
+                if request.POST.get('first_name'):
+                    request.user.first_name = request.POST.get('first_name')
+                    request.user.save()
                 return redirect('settings')
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(request.user, request.POST)
@@ -245,10 +249,51 @@ def settings_view(request):
         profile_form = ProfileForm(instance=profile)
         password_form = PasswordChangeForm(request.user)
 
+    pref_fields = [
+        {'label': 'Learning Goal', 'options': ['Get Certified', 'Learn Skills', 'Career Change'], 'icon': '🎯', 'color': '#8B5CF6'},
+        {'label': 'Experience Level', 'options': ['Beginner', 'Intermediate', 'Advanced'], 'icon': '📊', 'color': '#3B82F6'},
+        {'label': 'Study Time', 'options': ['< 1 hour/day', '1-3 hours/day', '3-5 hours/day'], 'icon': '⏰', 'color': '#34D399'},
+        {'label': 'Preferred Language', 'options': ['English', 'Swahili', 'French'], 'icon': '🌍', 'color': '#F59E0B'},
+        {'label': 'Content Type', 'options': ['Video & Text', 'Video Only', 'Text Only'], 'icon': '🎬', 'color': '#EC4899'},
+        {'label': 'Difficulty', 'options': ['Easy', 'Medium', 'Hard', 'Mixed'], 'icon': '🔥', 'color': '#EF4444'},
+    ]
+
+    connected_accounts = [
+        {'name': 'Google', 'icon': '🌐', 'handle': 'connect your google account', 'connected': False},
+        {'name': 'GitHub', 'icon': '🐙', 'handle': 'connect your github account', 'connected': False},
+        {'name': 'LinkedIn', 'icon': '💼', 'handle': 'connect your linkedin account', 'connected': False},
+    ]
+
+    quick_actions = [
+        {'icon': 'bi-pencil', 'label': 'Edit Profile', 'url': '/profile/'},
+        {'icon': 'bi-lock', 'label': 'Change Password', 'url': '#'},
+        {'icon': 'bi-download', 'label': 'Download My Data', 'url': '#'},
+        {'icon': 'bi-trash', 'label': 'Deactivate Account', 'url': '#'},
+    ]
+
+    privacy_items = [
+        {'label': 'Profile Visibility', 'value': 'Public'},
+        {'label': 'Activity Status', 'value': 'Friends'},
+        {'label': 'Course Progress', 'value': 'Private'},
+        {'label': 'Search Visibility', 'value': 'Visible'},
+    ]
+
+    storage_items = [
+        {'label': 'Course Downloads', 'size': '1.2 GB', 'color': '#8B5CF6'},
+        {'label': 'Certificates', 'size': '0.6 GB', 'color': '#3B82F6'},
+        {'label': 'Resources', 'size': '0.4 GB', 'color': '#F59E0B'},
+        {'label': 'Others', 'size': '0.2 GB', 'color': '#34D399'},
+    ]
     return render(request, 'core/settings.html', {
         'profile_form': profile_form,
         'password_form': password_form,
         'profile': profile,
+        'xp': progress.xp,
+        'pref_fields': pref_fields,
+        'connected_accounts': connected_accounts,
+        'quick_actions': quick_actions,
+        'privacy_items': privacy_items,
+        'storage_items': storage_items,
     })
 
 
@@ -276,3 +321,97 @@ def send_message(request, recipient_id):
         return redirect('inbox')
 
     return render(request, 'core/send_message.html', {'recipient': recipient})
+
+
+@login_required
+def assignments(request):
+    if request.user.profile.role == 'instructor':
+        courses = Course.objects.filter(instructor=request.user)
+        assignments = Assignment.objects.filter(course__in=courses)
+    else:
+        enrollments = Enrollment.objects.filter(student=request.user)
+        assignments = Assignment.objects.filter(course__in=enrollments.values('course'))
+    return render(request, 'core/assignments.html', {'assignments': assignments})
+
+
+@login_required
+def submit_assignment(request, assignment_id):
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        AssignmentSubmission.objects.create(
+            assignment=assignment,
+            student=request.user,
+            content=content,
+        )
+        return redirect('assignments')
+    return render(request, 'core/submit_assignment.html', {'assignment': assignment})
+
+
+
+@login_required
+def quizzes(request):
+    if request.user.profile.role == 'instructor':
+        courses = Course.objects.filter(instructor=request.user)
+        quizzes = Quiz.objects.filter(course__in=courses)
+    else:
+        enrollments = Enrollment.objects.filter(student=request.user)
+        quizzes = Quiz.objects.filter(course__in=enrollments.values('course'))
+    return render(request, 'core/quizzes.html', {'quizzes': quizzes})
+
+
+@login_required
+def take_quiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    questions = quiz.questions.all()
+
+    if request.method == 'POST':
+        score = 0
+        total = questions.count()
+        for question in questions:
+            answer = request.POST.get(f'question_{question.id}')
+            if answer == question.correct_option:
+                score += 1
+        QuizResult.objects.create(
+            quiz=quiz,
+            student=request.user,
+            score=score,
+            total=total,
+        )
+        progress, _ = StudentProgress.objects.get_or_create(student=request.user)
+        progress.xp += score * 10
+        progress.save()
+        if score == total:
+            Achievement.objects.get_or_create(student=request.user, badge='quiz_master')
+        return render(request, 'core/quiz_result.html', {'quiz': quiz, 'score': score, 'total': total})
+
+    return render(request, 'core/take_quiz.html', {'quiz': quiz, 'questions': questions})
+
+
+@login_required
+def certificates(request):
+    certs = Certificate.objects.filter(student=request.user)
+    return render(request, 'core/certificates.html', {'certificates': certs})
+
+
+@login_required
+def achievements(request):
+    progress, _ = StudentProgress.objects.get_or_create(student=request.user)
+    earned = Achievement.objects.filter(student=request.user)
+    all_badges = [
+        {'key': 'early_bird', 'name': 'Early Bird', 'emoji': '🐦', 'desc': 'Log in 7 days in a row', 'color': '#EF4444'},
+        {'key': 'quiz_master', 'name': 'Quiz Master', 'emoji': '🧠', 'desc': 'Score 100% on a quiz', 'color': '#8B5CF6'},
+        {'key': 'consistent', 'name': 'Consistent Learner', 'emoji': '🛡️', 'desc': 'Complete 10 lessons', 'color': '#3B82F6'},
+        {'key': 'first_course', 'name': 'First Course', 'emoji': '📚', 'desc': 'Enroll in your first course', 'color': '#F59E0B'},
+        {'key': 'streak_7', 'name': '7 Day Streak', 'emoji': '🔥', 'desc': 'Maintain a 7 day streak', 'color': '#F97316'},
+        {'key': 'streak_30', 'name': '30 Day Streak', 'emoji': '⚡', 'desc': 'Maintain a 30 day streak', 'color': '#34D399'},
+    ]
+    earned_keys = list(earned.values_list('badge', flat=True))
+    for badge in all_badges:
+        badge['earned'] = badge['key'] in earned_keys
+    return render(request, 'core/achievements.html', {
+        'badges': all_badges,
+        'xp': progress.xp,
+        'streak': progress.streak,
+        'earned_count': len(earned_keys),
+    })

@@ -28,16 +28,16 @@
         <a href="{% url 'course_list' %}">
             <i class="bi bi-compass-fill"></i> Explore
         </a>
-        <a href="#">
+        <a href="{% url 'assignments' %}" class="{% if request.resolver_match.url_name == 'assignments' %}active{% endif %}">
             <i class="bi bi-journal-check"></i> Assignments
         </a>
-        <a href="#">
+        <a href="{% url 'quizzes' %}" class="{% if request.resolver_match.url_name == 'quizzes' %}active{% endif %}">
             <i class="bi bi-patch-question-fill"></i> Quizzes
         </a>
-        <a href="#">
+        <a href="{% url 'certificates' %}" class="{% if request.resolver_match.url_name == 'certificates' %}active{% endif %}">
             <i class="bi bi-award-fill"></i> Certificates
         </a>
-        <a href="#">
+        <a href="{% url 'achievements' %}" class="{% if request.resolver_match.url_name == 'achievements' %}active{% endif %}">
             <i class="bi bi-trophy-fill"></i> Achievements
         </a>
         <a href="{% url 'inbox' %}" class="{% if request.resolver_match.url_name == 'inbox' %}active{% endif %}">

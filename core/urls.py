@@ -17,6 +17,11 @@ urlpatterns = [
     path('settings/', views.settings_view, name='settings'),
     path('inbox/', views.inbox, name='inbox'),
     path('message/<int:recipient_id>/', views.send_message, name='send_message'),
+    path('assignments/', views.assignments, name='assignments'),
+    path('assignments/<int:assignment_id>/submit/', views.submit_assignment, name='submit_assignment'),
+    path('quizzes/', views.quizzes, name='quizzes'),
+    path('quizzes/<int:quiz_id>/', views.take_quiz, name='take_quiz'),
+    path('certificates/', views.certificates, name='certificates'),
+    path('achievements/', views.achievements, name='achievements'),
 ]
- 
  

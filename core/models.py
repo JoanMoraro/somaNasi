@@ -134,7 +134,72 @@ class AssignmentSubmission(models.Model):
     grade = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.student.username} - {self.assignment.title}"          
+        return f"{self.student.username} - {self.assignment.title}"      
+    
+    
+class Quiz(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quizzes')
+    title = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} - {self.title}"
+
+
+class Question(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+    text = models.TextField()
+    option_a = models.CharField(max_length=200)
+    option_b = models.CharField(max_length=200)
+    option_c = models.CharField(max_length=200)
+    option_d = models.CharField(max_length=200)
+    correct_option = models.CharField(max_length=1, choices=[('a','A'),('b','B'),('c','C'),('d','D')])
+
+    def __str__(self):
+        return self.text[:60]
+
+
+class QuizResult(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='results')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quiz_results')
+    score = models.PositiveIntegerField(default=0)
+    total = models.PositiveIntegerField(default=0)
+    taken_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.quiz.title} - {self.score}/{self.total}"
+
+
+class Certificate(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certificates')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='certificates')
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'course')
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course.title}"
+
+
+class Achievement(models.Model):
+    BADGE_CHOICES = (
+        ('early_bird', '🐦 Early Bird'),
+        ('quiz_master', '🧠 Quiz Master'),
+        ('consistent', '🛡️ Consistent Learner'),
+        ('first_course', '📚 First Course'),
+        ('streak_7', '🔥 7 Day Streak'),
+        ('streak_30', '⚡ 30 Day Streak'),
+    )
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='achievements')
+    badge = models.CharField(max_length=50, choices=BADGE_CHOICES)
+    earned_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'badge')
+
+    def __str__(self):
+        return f"{self.student.username} - {self.badge}"        
     
     
         

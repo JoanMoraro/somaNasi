@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="stat-card" style="padding:28px;">
+            <h4 style="font-weight:700; color:#fff; margin-bottom:4px;">{{ assignment.title }}</h4>
+            <p style="color:var(--text-muted); margin-bottom:20px;">{{ assignment.course.title }}</p>
+            <p style="color:#ddd; font-size:0.9rem; margin-bottom:20px;">{{ assignment.description }}</p>
+            <form method="post">
+                {% csrf_token %}
+                <label style="color:#ddd; font-weight:600; display:block; margin-bottom:8px;">Your Submission</label>
+                <textarea name="content" rows="6" placeholder="Write your answer here..." required style="width:100%; background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:12px; padding:12px;"></textarea>
+                <button type="submit" class="btn-dark-pill mt-3" style="width:100%; padding:10px; text-align:center;">Submit Assignment</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

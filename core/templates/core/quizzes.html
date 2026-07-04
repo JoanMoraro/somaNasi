@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h3 style="font-weight:700;">Quizzes</h3>
+    <p style="color:var(--text-muted);">Test your knowledge and earn XP</p>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        {% for quiz in quizzes %}
+        <div class="course-row mb-3" style="padding:20px;">
+            <div class="d-flex align-items-center">
+                <div class="course-icon me-3"><i class="bi bi-patch-question-fill"></i></div>
+                <div>
+                    <h6 style="margin:0; color:#fff;">{{ quiz.title }}</h6>
+                    <small style="color:var(--text-muted);">{{ quiz.course.title }} &middot; {{ quiz.questions.count }} questions</small>
+                </div>
+            </div>
+            {% if user.profile.role == 'student' %}
+                <a href="{% url 'take_quiz' quiz.id %}" class="btn-dark-pill">Start Quiz</a>
+            {% else %}
+                <span style="color:var(--text-muted); font-size:0.82rem;">{{ quiz.results.count }} attempts</span>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="stat-card text-center py-5">
+            <div style="font-size:3rem; margin-bottom:12px;">🧠</div>
+            <h5 style="color:#fff;">No quizzes yet</h5>
+            <p style="color:var(--text-muted);">Quizzes will appear here once your instructor adds them.</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="padding:20px;">
+            <h6 style="font-weight:700; margin-bottom:16px;">Your Quiz Stats</h6>
+            <div class="d-flex justify-content-between mb-3">
+                <span style="color:var(--text-muted);">Total Quizzes</span>
+                <span style="color:#fff; font-weight:600;">{{ quizzes|length }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+                <span style="color:var(--text-muted);">Completed</span>
+                <span style="color:#34D399; font-weight:600;">0</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span style="color:var(--text-muted);">XP Available</span>
+                <span style="color:var(--purple-light); font-weight:600;">{{ quizzes|length }}0 XP</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

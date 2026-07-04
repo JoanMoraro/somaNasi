@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h3 style="font-weight:700;">Achievements</h3>
+    <p style="color:var(--text-muted);">Track your badges and milestones</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center" style="padding:24px;">
+            <div style="font-size:2rem; font-weight:800; color:var(--purple-light);">{{ xp }}</div>
+            <div style="color:var(--text-muted);">Total XP</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center" style="padding:24px;">
+            <div style="font-size:2rem; font-weight:800; color:#FBBF24;">{{ streak }}</div>
+            <div style="color:var(--text-muted);">Day Streak 🔥</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center" style="padding:24px;">
+            <div style="font-size:2rem; font-weight:800; color:#34D399;">{{ earned_count }}</div>
+            <div style="color:var(--text-muted);">Badges Earned</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% for badge in badges %}
+    <div class="col-md-4 mb-3">
+        <div class="stat-card" style="padding:20px; opacity:{% if badge.earned %}1{% else %}0.4{% endif %};">
+            <div class="d-flex align-items-center mb-3">
+                <div style="width:50px; height:50px; border-radius:50%; background:{{ badge.color }}22; border:2px solid {{ badge.color }}; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-right:14px;">
+                    {{ badge.emoji }}
+                </div>
+                <div>
+                    <div style="font-weight:700; color:#fff;">{{ badge.name }}</div>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">{{ badge.desc }}</div>
+                </div>
+            </div>
+            {% if badge.earned %}
+                <span style="font-size:0.78rem; color:#34D399;"><i class="bi bi-check-circle-fill me-1"></i>Earned</span>
+            {% else %}
+                <span style="font-size:0.78rem; color:var(--text-muted);"><i class="bi bi-lock-fill me-1"></i>Locked</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

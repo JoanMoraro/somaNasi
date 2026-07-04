@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h3 style="font-weight:700;">Certificates</h3>
+    <p style="color:var(--text-muted);">Your earned course completion certificates</p>
+</div>
+<div class="row">
+    {% for cert in certificates %}
+    <div class="col-md-4 mb-3">
+        <div class="stat-card" style="padding:24px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:12px;">🎓</div>
+            <h6 style="color:#fff; font-weight:700;">{{ cert.course.title }}</h6>
+            <p style="color:var(--text-muted); font-size:0.82rem;">Issued {{ cert.issued_at|date:"d M Y" }}</p>
+            <div style="border:1px solid var(--border-dark); border-radius:10px; padding:12px; margin:12px 0; font-size:0.78rem; color:var(--text-muted);">
+                This certifies that <strong style="color:#fff;">{{ cert.student.username }}</strong> successfully completed <strong style="color:#fff;">{{ cert.course.title }}</strong>
+            </div>
+            <a href="#" class="btn-dark-pill" style="font-size:0.82rem;">Download PDF</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="stat-card text-center py-5">
+            <div style="font-size:3rem; margin-bottom:12px;">🎓</div>
+            <h5 style="color:#fff;">No certificates yet</h5>
+            <p style="color:var(--text-muted);">Complete a course to earn your certificate.</p>
+            <a href="{% url 'course_list' %}" class="btn-dark-pill">Browse Courses</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

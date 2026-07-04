@@ -1,53 +1,308 @@
 {% extends 'core/base.html' %}
 {% block content %}
 
-<h2 class="mb-4">Settings</h2>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h3 style="font-weight:700; margin:0;">Settings</h3>
+        <p style="color:var(--text-muted); margin:4px 0 0;">Manage your account, preferences and more.</p>
+    </div>
+    <div style="font-size:3rem;">⚙️</div>
+</div>
+
+<!-- Tabs -->
+<div style="display:flex; gap:6px; margin-bottom:24px; border-bottom:1px solid var(--border-dark); padding-bottom:0;">
+    <button onclick="showTab('profile')" id="tab-profile" style="background:none; border:none; color:#fff; padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid var(--purple-light); margin-bottom:-1px;">Profile</button>
+    <button onclick="showTab('account')" id="tab-account" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">Account</button>
+    <button onclick="showTab('preferences')" id="tab-preferences" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">Preferences</button>
+    <button onclick="showTab('security')" id="tab-security" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">Security</button>
+    <button onclick="showTab('notifications')" id="tab-notifications" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">Notifications</button>
+    <button onclick="showTab('appearance')" id="tab-appearance" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">Appearance</button>
+    <button onclick="showTab('privacy')" id="tab-privacy" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">Privacy</button>
+</div>
 
 <div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="greeting-card">
-            <h5 class="fw-bold mb-3">Account Information</h5>
-            <p class="text-muted mb-1">Username</p>
-            <p class="mb-3">{{ user.username }}</p>
+    <!-- Main Content -->
+    <div class="col-md-8">
 
-            <p class="text-muted mb-1">Email</p>
-            <p class="mb-3">{{ user.email|default:"Not set" }}</p>
+        <!-- Profile Tab -->
+        <div id="content-profile">
+            <div class="stat-card mb-3" style="padding:28px;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size:1.1rem;">👤</span>
+                    <h5 style="font-weight:700; color:#fff; margin:0;">Profile Information</h5>
+                </div>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:24px;">Update your personal information and how others see you.</p>
 
-            <p class="text-muted mb-1">Role</p>
-            <p class="mb-0"><span class="badge bg-dark">{{ profile.role|capfirst }}</span></p>
+                <div class="d-flex align-items-center mb-4">
+                    <div style="position:relative; margin-right:20px;">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--purple);">
+                        {% else %}
+                            <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:#fff; border:3px solid var(--purple);">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                        <div style="position:absolute; bottom:0; right:0; width:26px; height:26px; background:var(--purple); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                            <i class="bi bi-pencil-fill" style="font-size:0.6rem; color:#fff;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label style="color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; display:block;">Full Name</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Your full name"
+                                style="width:100%; background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:10px; padding:10px 14px; font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-6">
+                            <label style="color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; display:block;">Username</label>
+                            <input type="text" value="{{ user.username }}" disabled
+                                style="width:100%; background:var(--card-dark-alt); color:var(--text-muted); border:1px solid var(--border-dark); border-radius:10px; padding:10px 14px; font-size:0.88rem;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label style="color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; display:block;">Bio</label>
+                        <textarea name="bio" rows="3" maxlength="180" placeholder="Tell us about yourself..."
+                            style="width:100%; background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:10px; padding:10px 14px; font-size:0.88rem; resize:none;">{{ profile.bio }}</textarea>
+                        <div style="text-align:right; color:var(--text-muted); font-size:0.75rem;">{{ profile.bio|length }}/180</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label style="color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; display:block;">Location</label>
+                            <div style="position:relative;">
+                                <i class="bi bi-geo-alt-fill" style="position:absolute; left:12px; top:11px; color:var(--text-muted); font-size:0.85rem;"></i>
+                                <input type="text" placeholder="e.g. Nairobi, Kenya"
+                                    style="width:100%; background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:10px; padding:10px 14px 10px 34px; font-size:0.88rem;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; display:block;">Website</label>
+                            <div style="position:relative;">
+                                <i class="bi bi-link-45deg" style="position:absolute; left:12px; top:11px; color:var(--text-muted); font-size:0.85rem;"></i>
+                                <input type="text" placeholder="https://yoursite.com"
+                                    style="width:100%; background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:10px; padding:10px 14px 10px 34px; font-size:0.88rem;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label style="color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; display:block;">Profile Photo</label>
+                        {{ profile_form.avatar }}
+                    </div>
+                    <button type="submit" name="update_profile"
+                        style="background:linear-gradient(135deg,var(--purple),var(--purple-deep)); color:#fff; border:none; border-radius:10px; padding:10px 24px; font-weight:600; cursor:pointer; font-size:0.88rem;">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Learning Preferences -->
+            <div class="stat-card mb-3" style="padding:28px;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size:1.1rem;">🎯</span>
+                    <h5 style="font-weight:700; color:#fff; margin:0;">Learning Preferences</h5>
+                </div>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:24px;">Customize your learning experience.</p>
+                <div class="row g-3">
+                    {% for pref in pref_fields %}
+                    <div class="col-md-4">
+                        <div style="background:var(--card-dark-alt); border:1px solid var(--border-dark); border-radius:12px; padding:14px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                                <div style="width:28px; height:28px; border-radius:8px; background:{{ pref.color }}22; display:flex; align-items:center; justify-content:center; font-size:0.9rem;">{{ pref.icon }}</div>
+                                <span style="color:var(--text-muted); font-size:0.72rem;">{{ pref.label }}</span>
+                            </div>
+                            <select style="width:100%; background:transparent; color:#fff; border:none; font-size:0.85rem; font-weight:600; cursor:pointer; outline:none;">
+                                {% for opt in pref.options %}
+                                    <option style="background:var(--card-dark);">{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Connected Accounts -->
+            <div class="stat-card mb-3" style="padding:28px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:1.1rem;">🔗</span>
+                        <h5 style="font-weight:700; color:#fff; margin:0;">Connected Accounts</h5>
+                    </div>
+                    <button style="background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:8px; padding:6px 14px; font-size:0.8rem; cursor:pointer;">Connect New Account</button>
+                </div>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Manage your connected third-party accounts.</p>
+                {% for acc in connected_accounts %}
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border-dark);">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <div style="width:40px; height:40px; border-radius:10px; background:var(--card-dark-alt); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">{{ acc.icon }}</div>
+                        <div>
+                            <div style="color:#fff; font-weight:600; font-size:0.88rem;">{{ acc.name }}</div>
+                            <div style="color:var(--text-muted); font-size:0.78rem;">{{ acc.handle }}</div>
+                        </div>
+                    </div>
+                    {% if acc.connected %}
+                        <div style="display:flex; align-items:center; gap:6px; color:#34D399; font-size:0.82rem;">
+                            <div style="width:8px; height:8px; border-radius:50%; background:#34D399;"></div>
+                            Connected <i class="bi bi-chevron-right" style="color:var(--text-muted);"></i>
+                        </div>
+                    {% else %}
+                        <button style="background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:8px; padding:6px 16px; font-size:0.8rem; cursor:pointer;">Connect</button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Security Banner -->
+            <div style="background:linear-gradient(135deg,#1E3A5F,#1A2D4A); border:1px solid #2A4A6B; border-radius:16px; padding:24px; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="font-size:2.5rem;">🛡️</div>
+                    <div>
+                        <div style="font-weight:700; color:#fff; margin-bottom:4px;">Your account is protected</div>
+                        <div style="color:#94A3B8; font-size:0.85rem;">We use advanced security to keep your data safe.</div>
+                    </div>
+                </div>
+                <button onclick="showTab('security')" style="background:linear-gradient(135deg,var(--purple),var(--purple-deep)); color:#fff; border:none; border-radius:10px; padding:10px 18px; font-size:0.82rem; font-weight:600; cursor:pointer; white-space:nowrap;">
+                    Review Security Settings <i class="bi bi-chevron-right ms-1"></i>
+                </button>
+            </div>
         </div>
+
+        <!-- Security Tab -->
+        <div id="content-security" style="display:none;">
+            <div class="stat-card" style="padding:28px;">
+                <h5 style="font-weight:700; color:#fff; margin-bottom:20px;">🔒 Change Password</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ password_form.as_p }}
+                    <button type="submit" name="change_password"
+                        style="background:linear-gradient(135deg,var(--purple),var(--purple-deep)); color:#fff; border:none; border-radius:10px; padding:10px 24px; font-weight:600; cursor:pointer; margin-top:10px;">
+                        Update Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Account Tab -->
+        <div id="content-account" style="display:none;">
+            <div class="stat-card text-center py-5"><div style="font-size:2.5rem; margin-bottom:12px;">🚧</div><h5 style="color:#fff;">Account Settings</h5><p style="color:var(--text-muted);">Coming soon.</p></div>
+        </div>
+
+        <!-- Preferences Tab -->
+        <div id="content-preferences" style="display:none;">
+            <div class="stat-card text-center py-5"><div style="font-size:2.5rem; margin-bottom:12px;">🚧</div><h5 style="color:#fff;">Preferences</h5><p style="color:var(--text-muted);">Coming soon.</p></div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="content-notifications" style="display:none;">
+            <div class="stat-card text-center py-5"><div style="font-size:2.5rem; margin-bottom:12px;">🚧</div><h5 style="color:#fff;">Notifications</h5><p style="color:var(--text-muted);">Coming soon.</p></div>
+        </div>
+
+        <!-- Appearance Tab -->
+        <div id="content-appearance" style="display:none;">
+            <div class="stat-card text-center py-5"><div style="font-size:2.5rem; margin-bottom:12px;">🚧</div><h5 style="color:#fff;">Appearance</h5><p style="color:var(--text-muted);">Coming soon.</p></div>
+        </div>
+
+        <!-- Privacy Tab -->
+        <div id="content-privacy" style="display:none;">
+            <div class="stat-card text-center py-5"><div style="font-size:2.5rem; margin-bottom:12px;">🚧</div><h5 style="color:#fff;">Privacy</h5><p style="color:var(--text-muted);">Coming soon.</p></div>
+        </div>
+
     </div>
 
-    <div class="col-md-6 mb-4">
-        <div class="greeting-card">
-            <h5 class="fw-bold mb-3">Edit Bio</h5>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-
+    <!-- Right Sidebar -->
+    <div class="col-md-4">
+        <!-- Profile Card -->
+        <div class="stat-card mb-3" style="padding:24px; text-align:center; background:linear-gradient(135deg,#1A1040,#0F0B1E); border:1px solid var(--purple);">
+            <div style="position:relative; display:inline-block; margin-bottom:12px;">
                 {% if profile.avatar %}
-                    <img src="{{ profile.avatar.url }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit:cover;">
+                    <img src="{{ profile.avatar.url }}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--purple);">
+                {% else %}
+                    <div style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:#fff; margin:0 auto; border:3px solid var(--purple);">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
                 {% endif %}
-
-                <label class="form-label fw-bold">Profile Photo</label>
-                {{ profile_form.avatar }}
-
-                <label class="form-label fw-bold mt-3">Bio</label>
-                {{ profile_form.bio }}
-                <button type="submit" name="update_profile" class="btn-dark-pill mt-3">Save Changes</button>
-            </form>
+            </div>
+            <div style="font-weight:700; font-size:1.1rem; color:#fff; margin-bottom:4px;">{{ user.get_full_name|default:user.username }}</div>
+            <div style="background:var(--purple); color:#fff; font-size:0.72rem; border-radius:20px; padding:2px 12px; display:inline-block; margin-bottom:16px;">{{ profile.role|capfirst }}</div>
+            <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.78rem; margin-bottom:8px;">
+                <span>Level 1</span>
+                <span>{{ xp }}/1000 XP</span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width:{% widthratio xp 1000 100 %}%;"></div>
+            </div>
         </div>
-    </div>
 
-    <div class="col-md-6">
-        <div class="greeting-card">
-            <h5 class="fw-bold mb-3">Change Password</h5>
-            <form method="post">
-                {% csrf_token %}
-                {{ password_form.as_p }}
-                <button type="submit" name="change_password" class="btn-dark-pill mt-2">Update Password</button>
-            </form>
+        <!-- Quick Actions -->
+        <div class="stat-card mb-3" style="padding:20px;">
+            <h6 style="font-weight:700; color:#fff; margin-bottom:16px;">Quick Actions</h6>
+            {% for action in quick_actions %}
+            <a href="{{ action.url }}" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-dark); text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px; color:#ddd; font-size:0.85rem;">
+                    <i class="bi {{ action.icon }}" style="color:var(--text-muted);"></i> {{ action.label }}
+                </div>
+                <i class="bi bi-chevron-right" style="color:var(--text-muted); font-size:0.75rem;"></i>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Privacy Overview -->
+        <div class="stat-card mb-3" style="padding:20px;">
+            <h6 style="font-weight:700; color:#fff; margin-bottom:6px;">Privacy Overview</h6>
+            <p style="color:var(--text-muted); font-size:0.78rem; margin-bottom:16px;">You have strong privacy protections enabled.</p>
+            <div style="text-align:center; margin-bottom:16px;">
+                <div style="width:70px; height:70px; border-radius:50%; border:3px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto;">🛡️</div>
+            </div>
+            {% for item in privacy_items %}
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-dark); font-size:0.82rem;">
+                <div style="display:flex; align-items:center; gap:6px; color:#ddd;">
+                    <div style="width:8px; height:8px; border-radius:50%; background:#34D399;"></div>
+                    {{ item.label }}
+                </div>
+                <span style="color:var(--text-muted);">{{ item.value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Storage Usage -->
+        <div class="stat-card" style="padding:20px;">
+            <h6 style="font-weight:700; color:#fff; margin-bottom:4px;">Storage Usage</h6>
+            <p style="color:var(--text-muted); font-size:0.78rem; margin-bottom:12px;">2.4 GB of 10 GB used</p>
+            <div class="progress-bar-track mb-3" style="height:10px;">
+                <div class="progress-bar-fill" style="width:24%; height:10px;"></div>
+            </div>
+            {% for item in storage_items %}
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:0.82rem;">
+                <div style="display:flex; align-items:center; gap:8px; color:#ddd;">
+                    <div style="width:10px; height:10px; border-radius:2px; background:{{ item.color }};"></div>
+                    {{ item.label }}
+                </div>
+                <span style="color:var(--text-muted);">{{ item.size }}</span>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(name) {
+    const tabs = ['profile','account','preferences','security','notifications','appearance','privacy'];
+    tabs.forEach(t => {
+        document.getElementById('content-' + t).style.display = 'none';
+        const btn = document.getElementById('tab-' + t);
+        btn.style.color = 'var(--text-muted)';
+        btn.style.borderBottom = '2px solid transparent';
+    });
+    document.getElementById('content-' + name).style.display = 'block';
+    const active = document.getElementById('tab-' + name);
+    active.style.color = '#fff';
+    active.style.borderBottom = '2px solid var(--purple-light)';
+}
+</script>
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 text-center">
+        <div class="stat-card" style="padding:40px;">
+            <div style="font-size:3rem; margin-bottom:16px;">
+                {% if score == total %}🏆{% elif score >= total|divisibleby:2 %}🎯{% else %}📚{% endif %}
+            </div>
+            <h3 style="font-weight:700; color:#fff;">{{ score }}/{{ total }}</h3>
+            <p style="color:var(--text-muted); margin-bottom:20px;">
+                {% if score == total %}Perfect score! You earned the Quiz Master badge!
+                {% elif score > 0 %}Good effort! Keep practicing.
+                {% else %}Keep studying and try again!{% endif %}
+            </p>
+            <div style="background:var(--card-dark-alt); border-radius:12px; padding:14px; margin-bottom:24px;">
+                <span style="color:var(--purple-light); font-size:1.2rem; font-weight:700;">+{{ score }}0 XP earned</span>
+            </div>
+            <a href="{% url 'quizzes' %}" class="btn-dark-pill" style="padding:10px 30px;">Back to Quizzes</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
