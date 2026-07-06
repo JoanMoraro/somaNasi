@@ -1,23 +1,37 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>My Courses</h2>
-    <a href="{% url 'create_course' %}" class="btn btn-primary">+ Create New Course</a>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 style="font-weight:700;">My Courses</h3>
+        <p style="color:var(--text-muted);">Manage your created courses</p>
+    </div>
+    <a href="{% url 'create_course' %}" class="btn-dark-pill">+ New Course</a>
 </div>
 
 <div class="row">
-{% for course in courses %}
+    {% for course in courses %}
     <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ course.title }}</h5>
-                <p class="card-text">KES {{ course.price }}</p>
-                <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-primary btn-sm">View</a>
+        <div class="stat-card" style="padding:20px;">
+            <div style="width:100%; height:80px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:14px;">📘</div>
+            <h6 style="color:#fff; font-weight:700; margin-bottom:4px;">{{ course.title }}</h6>
+            <small style="color:var(--text-muted);">KES {{ course.price }} &middot; {{ course.enrollments.count }} students</small>
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'course_detail' course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 14px;">View</a>
+                <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 14px; background:var(--card-dark-alt);">+ Lesson</a>
             </div>
         </div>
     </div>
-{% empty %}
-    <p>You haven't created any courses yet.</p>
-{% endfor %}
+    {% empty %}
+    <div class="col-12">
+        <div class="stat-card text-center py-5">
+            <div style="font-size:3rem; margin-bottom:12px;">📚</div>
+            <h5 style="color:#fff;">No courses yet</h5>
+            <p style="color:var(--text-muted);">Create your first course to get started.</p>
+            <a href="{% url 'create_course' %}" class="btn-dark-pill">Create Course</a>
+        </div>
+    </div>
+    {% endfor %}
 </div>
+
 {% endblock %}

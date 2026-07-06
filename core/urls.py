@@ -23,5 +23,10 @@ urlpatterns = [
     path('quizzes/<int:quiz_id>/', views.take_quiz, name='take_quiz'),
     path('certificates/', views.certificates, name='certificates'),
     path('achievements/', views.achievements, name='achievements'),
+    path('students/', views.students, name='students'),
+    path('analytics/', views.analytics, name='analytics'),
+    path('earnings/', views.earnings, name='earnings'),
+    path('reviews/', views.reviews, name='reviews'),
+    path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
 ]
  

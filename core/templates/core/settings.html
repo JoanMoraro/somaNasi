@@ -22,11 +22,12 @@
 </div>
 
 <div class="row">
-    <!-- Main Content -->
     <div class="col-md-8">
 
         <!-- Profile Tab -->
         <div id="content-profile">
+
+            <!-- Profile Information -->
             <div class="stat-card mb-3" style="padding:28px;">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size:1.1rem;">👤</span>
@@ -98,7 +99,8 @@
                 </form>
             </div>
 
-            <!-- Learning Preferences -->
+            <!-- Learning Preferences — Students only -->
+            {% if user.profile.role == 'student' %}
             <div class="stat-card mb-3" style="padding:28px;">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size:1.1rem;">🎯</span>
@@ -123,6 +125,7 @@
                     {% endfor %}
                 </div>
             </div>
+            {% endif %}
 
             <!-- Connected Accounts -->
             <div class="stat-card mb-3" style="padding:28px;">
@@ -156,7 +159,7 @@
             </div>
 
             <!-- Security Banner -->
-            <div style="background:linear-gradient(135deg,#1E3A5F,#1A2D4A); border:1px solid #2A4A6B; border-radius:16px; padding:24px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="background:linear-gradient(135deg,#1E3A5F,#1A2D4A); border:1px solid #2A4A6B; border-radius:16px; padding:24px; display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
                 <div style="display:flex; align-items:center; gap:16px;">
                     <div style="font-size:2.5rem;">🛡️</div>
                     <div>
@@ -214,6 +217,7 @@
 
     <!-- Right Sidebar -->
     <div class="col-md-4">
+
         <!-- Profile Card -->
         <div class="stat-card mb-3" style="padding:24px; text-align:center; background:linear-gradient(135deg,#1A1040,#0F0B1E); border:1px solid var(--purple);">
             <div style="position:relative; display:inline-block; margin-bottom:12px;">
@@ -227,6 +231,7 @@
             </div>
             <div style="font-weight:700; font-size:1.1rem; color:#fff; margin-bottom:4px;">{{ user.get_full_name|default:user.username }}</div>
             <div style="background:var(--purple); color:#fff; font-size:0.72rem; border-radius:20px; padding:2px 12px; display:inline-block; margin-bottom:16px;">{{ profile.role|capfirst }}</div>
+            {% if user.profile.role == 'student' %}
             <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.78rem; margin-bottom:8px;">
                 <span>Level 1</span>
                 <span>{{ xp }}/1000 XP</span>
@@ -234,6 +239,7 @@
             <div class="progress-bar-track">
                 <div class="progress-bar-fill" style="width:{% widthratio xp 1000 100 %}%;"></div>
             </div>
+            {% endif %}
         </div>
 
         <!-- Quick Actions -->
@@ -284,6 +290,7 @@
             </div>
             {% endfor %}
         </div>
+
     </div>
 </div>
 

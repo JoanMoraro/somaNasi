@@ -7,7 +7,7 @@ from .mpesa import stk_push
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
-
+from django.http import JsonResponse
 
 
 def home(request):
@@ -61,6 +61,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'core/signup.html', {'form': form})
 
+
 @login_required
 def enroll(request, course_id):
     course = get_object_or_404(Course, id=course_id)
@@ -78,18 +79,30 @@ def enroll(request, course_id):
             amount=course.price,
             status='pending',
         )
-        response = stk_push(
-            phone_number=phone_number,
-            amount=int(course.price),
-            account_reference=f"course-{course.id}",
-            transaction_desc=f"Payment for {course.title}",
-        )
-        payment.checkout_request_id = response.get('CheckoutRequestID', '')
-        payment.save()
-        return render(request, 'core/payment_pending.html', {'course': course})
+        try:
+            response = stk_push(
+                phone_number=phone_number,
+                amount=int(course.price),
+                account_reference=f"course-{course.id}",
+                transaction_desc=f"Payment for {course.title}",
+            )
+            print("MPESA RESPONSE:", response)
+            if response.get('ResponseCode') == '0':
+                payment.checkout_request_id = response.get('CheckoutRequestID', '')
+                payment.save()
+                return render(request, 'core/payment_pending.html', {'course': course})
+            else:
+                payment.status = 'failed'
+                payment.save()
+                error = response.get('errorMessage', 'M-Pesa request failed')
+                return render(request, 'core/payment_form.html', {'course': course, 'error': error})
+        except Exception as e:
+            print("MPESA ERROR:", str(e))
+            payment.status = 'failed'
+            payment.save()
+            return render(request, 'core/payment_form.html', {'course': course, 'error': str(e)})
 
     return render(request, 'core/payment_form.html', {'course': course})
-
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -227,11 +240,12 @@ def profile_view(request):
 def settings_view(request):
     profile = request.user.profile
     progress, _ = StudentProgress.objects.get_or_create(student=request.user)
+    profile_form = ProfileForm(instance=profile)
+    password_form = PasswordChangeForm(request.user)
 
     if request.method == 'POST':
         if 'update_profile' in request.POST:
             profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
-            password_form = PasswordChangeForm(request.user)
             if profile_form.is_valid():
                 profile_form.save()
                 if request.POST.get('first_name'):
@@ -240,14 +254,10 @@ def settings_view(request):
                 return redirect('settings')
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(request.user, request.POST)
-            profile_form = ProfileForm(instance=profile)
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)
                 return redirect('settings')
-    else:
-        profile_form = ProfileForm(instance=profile)
-        password_form = PasswordChangeForm(request.user)
 
     pref_fields = [
         {'label': 'Learning Goal', 'options': ['Get Certified', 'Learn Skills', 'Career Change'], 'icon': '🎯', 'color': '#8B5CF6'},
@@ -257,33 +267,30 @@ def settings_view(request):
         {'label': 'Content Type', 'options': ['Video & Text', 'Video Only', 'Text Only'], 'icon': '🎬', 'color': '#EC4899'},
         {'label': 'Difficulty', 'options': ['Easy', 'Medium', 'Hard', 'Mixed'], 'icon': '🔥', 'color': '#EF4444'},
     ]
-
     connected_accounts = [
-        {'name': 'Google', 'icon': '🌐', 'handle': 'connect your google account', 'connected': False},
-        {'name': 'GitHub', 'icon': '🐙', 'handle': 'connect your github account', 'connected': False},
-        {'name': 'LinkedIn', 'icon': '💼', 'handle': 'connect your linkedin account', 'connected': False},
+        {'name': 'Google', 'icon': '🌐', 'handle': 'Connect your Google account', 'connected': False},
+        {'name': 'GitHub', 'icon': '🐙', 'handle': 'Connect your GitHub account', 'connected': False},
+        {'name': 'LinkedIn', 'icon': '💼', 'handle': 'Connect your LinkedIn account', 'connected': False},
     ]
-
     quick_actions = [
         {'icon': 'bi-pencil', 'label': 'Edit Profile', 'url': '/profile/'},
         {'icon': 'bi-lock', 'label': 'Change Password', 'url': '#'},
         {'icon': 'bi-download', 'label': 'Download My Data', 'url': '#'},
         {'icon': 'bi-trash', 'label': 'Deactivate Account', 'url': '#'},
     ]
-
     privacy_items = [
         {'label': 'Profile Visibility', 'value': 'Public'},
         {'label': 'Activity Status', 'value': 'Friends'},
         {'label': 'Course Progress', 'value': 'Private'},
         {'label': 'Search Visibility', 'value': 'Visible'},
     ]
-
     storage_items = [
         {'label': 'Course Downloads', 'size': '1.2 GB', 'color': '#8B5CF6'},
         {'label': 'Certificates', 'size': '0.6 GB', 'color': '#3B82F6'},
         {'label': 'Resources', 'size': '0.4 GB', 'color': '#F59E0B'},
         {'label': 'Others', 'size': '0.2 GB', 'color': '#34D399'},
     ]
+
     return render(request, 'core/settings.html', {
         'profile_form': profile_form,
         'password_form': password_form,
@@ -415,3 +422,74 @@ def achievements(request):
         'streak': progress.streak,
         'earned_count': len(earned_keys),
     })
+
+
+@login_required
+def students(request):
+    if request.user.profile.role != 'instructor':
+        return redirect('dashboard')
+    courses = Course.objects.filter(instructor=request.user)
+    enrollments = Enrollment.objects.filter(course__in=courses).select_related('student', 'course')
+    return render(request, 'core/students.html', {'enrollments': enrollments, 'courses': courses})
+
+
+
+@login_required
+def analytics(request):
+    if request.user.profile.role != 'instructor':
+        return redirect('dashboard')
+    return render(request, 'core/analytics.html')
+
+@login_required
+def earnings(request):
+    if request.user.profile.role != 'instructor':
+        return redirect('dashboard')
+    return render(request, 'core/earnings.html')
+
+
+@login_required
+def reviews(request):
+    if request.user.profile.role != 'instructor':
+        return redirect('dashboard')
+    courses = Course.objects.filter(instructor=request.user)
+    return render(request, 'core/reviews.html', {'courses': courses})
+
+
+import json
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def mpesa_callback(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            result = data['Body']['stkCallback']
+            result_code = result['ResultCode']
+            checkout_request_id = result['CheckoutRequestID']
+
+            payment = Payment.objects.filter(checkout_request_id=checkout_request_id).first()
+            if not payment:
+                return JsonResponse({'status': 'payment not found'})
+
+            if result_code == 0:
+                payment.status = 'completed'
+                payment.save()
+                Enrollment.objects.get_or_create(
+                    student=payment.student,
+                    course=payment.course,
+                )
+                progress, _ = StudentProgress.objects.get_or_create(student=payment.student)
+                progress.xp += 50
+                progress.save()
+                Achievement.objects.get_or_create(
+                    student=payment.student,
+                    badge='first_course'
+                )
+            else:
+                payment.status = 'failed'
+                payment.save()
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'ok'})

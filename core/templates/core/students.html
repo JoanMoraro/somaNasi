@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="mb-4">
+    <h3 style="font-weight:700;">Students</h3>
+    <p style="color:var(--text-muted);">All students enrolled in your courses</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-number">{{ enrollments|length }}</div>
+            <div class="stat-label">Total Enrollments</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-number">{{ courses|length }}</div>
+            <div class="stat-label">Your Courses</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-number">{{ enrollments|length }}</div>
+            <div class="stat-label">Active Learners</div>
+        </div>
+    </div>
+</div>
+
+<div class="stat-card" style="padding:24px;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+            <tr style="color:var(--text-muted); border-bottom:1px solid var(--border-dark);">
+                <th style="padding:12px 0; font-weight:500;">Student</th>
+                <th style="padding:12px 0; font-weight:500;">Course</th>
+                <th style="padding:12px 0; font-weight:500;">Enrolled</th>
+                <th style="padding:12px 0; font-weight:500;">Progress</th>
+                <th style="padding:12px 0; font-weight:500;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+            <tr style="border-bottom:1px solid var(--border-dark);">
+                <td style="padding:14px 0;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.85rem;">
+                            {{ enrollment.student.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div style="color:#fff; font-weight:600;">{{ enrollment.student.username }}</div>
+                            <div style="color:var(--text-muted); font-size:0.75rem;">{{ enrollment.student.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="padding:14px 0; color:#fff;">{{ enrollment.course.title|truncatechars:25 }}</td>
+                <td style="padding:14px 0; color:var(--text-muted);">{{ enrollment.enrolled_at|date:"d M Y" }}</td>
+                <td style="padding:14px 0;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div class="progress-bar-track" style="width:80px;">
+                            <div class="progress-bar-fill" style="width:{{ enrollment.progress }}%;"></div>
+                        </div>
+                        <span style="color:#fff; font-size:0.78rem;">{{ enrollment.progress }}%</span>
+                    </div>
+                </td>
+                <td style="padding:14px 0;">
+                    {% if enrollment.completed %}
+                        <span style="background:#34D39922; color:#34D399; padding:3px 10px; border-radius:20px; font-size:0.75rem;">Completed</span>
+                    {% else %}
+                        <span style="background:#A78BFA22; color:#A78BFA; padding:3px 10px; border-radius:20px; font-size:0.75rem;">In Progress</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding:40px 0; text-align:center; color:var(--text-muted);">No students enrolled yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

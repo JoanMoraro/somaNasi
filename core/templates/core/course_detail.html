@@ -1,36 +1,66 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h1>{{ course.title }}</h1>
-<p class="text-muted">KES {{ course.price }}</p>
-<p>{{ course.description }}</p>
 
-{% if user == course.instructor %}
-    <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:4px 14px;">+ Add Lesson</a>
-{% endif %}
-{% elif user.is_authenticated and user.profile.role == 'student' %}
-    <a href="{% url 'enroll' course.id %}" class="btn-dark-pill mb-3 d-inline-block">Enroll in this course</a>
-    <a href="{% url 'send_message' course.instructor.id %}" class="btn-dark-pill mb-3 d-inline-block ms-2" style="background:#fff; color:#1A1A1A; border:1px solid #1A1A1A;">Message Instructor</a>
+<div class="row">
+    <div class="col-md-8">
+        <div class="stat-card mb-3" style="padding:28px;">
+            <h3 style="font-weight:700; color:#fff; margin-bottom:8px;">{{ course.title }}</h3>
+            <p style="color:var(--purple-light); font-size:0.9rem; margin-bottom:12px;">KES {{ course.price }}</p>
+            <p style="color:var(--text-muted); margin-bottom:20px;">{{ course.description }}</p>
 
-{% elif user.is_authenticated and user.profile.role == 'instructor' %}
-    <p class="text-muted">You're viewing another instructor's course.</p>
+            {% if user == course.instructor %}
+                <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill mb-3 d-inline-block">+ Add Lesson</a>
+            {% elif user.is_authenticated and user.profile.role == 'student' %}
+                <a href="{% url 'enroll' course.id %}" class="btn-dark-pill mb-3 d-inline-block">Enroll in this course</a>
+                <a href="{% url 'send_message' course.instructor.id %}" class="btn-dark-pill mb-3 d-inline-block ms-2" style="background:var(--card-dark-alt); border:1px solid var(--border-dark);">Message Instructor</a>
+            {% elif user.is_authenticated and user.profile.role == 'instructor' %}
+                <p style="color:var(--text-muted);">You're viewing another instructor's course.</p>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-dark-pill mb-3 d-inline-block">Login to enroll</a>
+            {% endif %}
+        </div>
 
-{% else %}
-    <a href="{% url 'login' %}" class="btn-dark-pill mb-3 d-inline-block">Login to enroll</a>
-{% endif %}
-<div class="d-flex justify-content-between align-items-center">
-    <h3>Lessons</h3>
-    {% if user == course.instructor %}
-        <a href="{% url 'add_lesson' course.id %}" class="btn btn-sm btn-outline-primary">+ Add Lesson</a>
-    {% endif %}
+        <div class="stat-card" style="padding:28px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="font-weight:700; color:#fff; margin:0;">Lessons</h5>
+                {% if user == course.instructor %}
+                    <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 14px;">+ Add Lesson</a>
+                {% endif %}
+            </div>
+            <ul style="list-style:none; padding:0; margin:0;">
+            {% for lesson in lessons %}
+                <li style="padding:14px 0; border-bottom:1px solid var(--border-dark); display:flex; align-items:center; gap:12px;">
+                    <div style="width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem; font-weight:700; flex-shrink:0;">{{ forloop.counter }}</div>
+                    <a href="{% url 'lesson_detail' course.id lesson.id %}" style="color:#fff; text-decoration:none; font-weight:600; font-size:0.9rem;">{{ lesson.title }}</a>
+                </li>
+            {% empty %}
+                <li style="padding:20px 0; text-align:center; color:var(--text-muted);">No lessons added yet.</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card mb-3" style="padding:20px;">
+            <h6 style="font-weight:700; color:#fff; margin-bottom:16px;">Course Info</h6>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dark); font-size:0.85rem;">
+                <span style="color:var(--text-muted);">Instructor</span>
+                <span style="color:#fff; font-weight:600;">{{ course.instructor.username }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dark); font-size:0.85rem;">
+                <span style="color:var(--text-muted);">Lessons</span>
+                <span style="color:#fff; font-weight:600;">{{ lessons|length }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dark); font-size:0.85rem;">
+                <span style="color:var(--text-muted);">Students</span>
+                <span style="color:#fff; font-weight:600;">{{ course.enrollments.count }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; font-size:0.85rem;">
+                <span style="color:var(--text-muted);">Price</span>
+                <span style="color:var(--purple-light); font-weight:600;">KES {{ course.price }}</span>
+            </div>
+        </div>
+    </div>
 </div>
 
-<ul class="list-group">
-{% for lesson in lessons %}
-    <li class="list-group-item">
-        <a href="{% url 'lesson_detail' course.id lesson.id %}">{{ lesson.title }}</a>
-    </li>
-{% empty %}
-    <li class="list-group-item">No lessons added yet.</li>
-{% endfor %}
-</ul>
 {% endblock %}

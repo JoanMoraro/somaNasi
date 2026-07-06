@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="mb-4">
+    <h3 style="font-weight:700;">Reviews</h3>
+    <p style="color:var(--text-muted);">Student feedback on your courses</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-number" style="color:#FBBF24;">4.8 ★</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Total Reviews</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-number">{{ courses|length }}</div>
+            <div class="stat-label">Courses Reviewed</div>
+        </div>
+    </div>
+</div>
+
+<div class="stat-card text-center py-5">
+    <div style="font-size:3rem; margin-bottom:12px;">⭐</div>
+    <h5 style="color:#fff;">No reviews yet</h5>
+    <p style="color:var(--text-muted);">Student reviews will appear here once they start rating your courses.</p>
+</div>
+
+{% endblock %}

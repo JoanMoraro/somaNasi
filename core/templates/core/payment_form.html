@@ -2,14 +2,22 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-5">
-        <div class="greeting-card">
-            <h4>Pay for {{ course.title }}</h4>
-            <p class="text-muted">Amount: KES {{ course.price }}</p>
+        <div class="stat-card" style="padding:28px;">
+            <h4 style="color:#fff; font-weight:700; margin-bottom:4px;">Pay for {{ course.title }}</h4>
+            <p style="color:var(--text-muted); margin-bottom:20px;">Amount: KES {{ course.price }}</p>
+
+            {% if error %}
+            <div style="background:#EF444422; border:1px solid #EF4444; border-radius:10px; padding:12px 16px; margin-bottom:16px; color:#EF4444; font-size:0.85rem;">
+                {{ error }}
+            </div>
+            {% endif %}
+
             <form method="post">
                 {% csrf_token %}
-                <label class="form-label fw-bold">M-Pesa Phone Number</label>
-                <input type="text" name="phone_number" class="form-control mb-3" placeholder="2547XXXXXXXX" required>
-                <button type="submit" class="btn-dark-pill">Pay with M-Pesa</button>
+                <label style="color:#ddd; font-weight:600; display:block; margin-bottom:8px;">M-Pesa Phone Number</label>
+                <input type="text" name="phone_number" placeholder="2547XXXXXXXX" required
+                    style="width:100%; background:var(--card-dark-alt); color:#fff; border:1px solid var(--border-dark); border-radius:10px; padding:10px 14px; margin-bottom:16px;">
+                <button type="submit" class="btn-dark-pill" style="width:100%; padding:10px; text-align:center;">Pay with M-Pesa</button>
             </form>
         </div>
     </div>
