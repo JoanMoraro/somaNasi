@@ -1,66 +1,344 @@
 {% extends 'core/base.html' %}
 {% block content %}
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="stat-card mb-3" style="padding:28px;">
-            <h3 style="font-weight:700; color:#fff; margin-bottom:8px;">{{ course.title }}</h3>
-            <p style="color:var(--purple-light); font-size:0.9rem; margin-bottom:12px;">KES {{ course.price }}</p>
-            <p style="color:var(--text-muted); margin-bottom:20px;">{{ course.description }}</p>
+<!-- Back button -->
+<div class="mb-3">
+    <a href="{% url 'course_list' %}" style="color:var(--text-muted); text-decoration:none; font-size:0.85rem;">
+        <i class="bi bi-arrow-left me-2"></i>Back to Courses
+    </a>
+</div>
 
-            {% if user == course.instructor %}
-                <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill mb-3 d-inline-block">+ Add Lesson</a>
-            {% elif user.is_authenticated and user.profile.role == 'student' %}
-                <a href="{% url 'enroll' course.id %}" class="btn-dark-pill mb-3 d-inline-block">Enroll in this course</a>
-                <a href="{% url 'send_message' course.instructor.id %}" class="btn-dark-pill mb-3 d-inline-block ms-2" style="background:var(--card-dark-alt); border:1px solid var(--border-dark);">Message Instructor</a>
-            {% elif user.is_authenticated and user.profile.role == 'instructor' %}
-                <p style="color:var(--text-muted);">You're viewing another instructor's course.</p>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn-dark-pill mb-3 d-inline-block">Login to enroll</a>
-            {% endif %}
+<!-- Course Header -->
+<div class="stat-card mb-3" style="padding:24px;">
+    <div class="row align-items-center">
+        <div class="col-md-2">
+            <div style="width:100%; aspect-ratio:1; border-radius:16px; background:linear-gradient(135deg,#4C1D95,#2D1B69); display:flex; align-items:center; justify-content:center; font-size:3rem;">📘</div>
         </div>
-
-        <div class="stat-card" style="padding:28px;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 style="font-weight:700; color:#fff; margin:0;">Lessons</h5>
+        <div class="col-md-7">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h3 style="font-weight:800; color:#fff; margin:0;">{{ course.title }}</h3>
                 {% if user == course.instructor %}
-                    <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 14px;">+ Add Lesson</a>
+                <span style="background:#34D39922; color:#34D399; font-size:0.72rem; padding:3px 10px; border-radius:20px; border:1px solid #34D399;">✓ Published</span>
                 {% endif %}
             </div>
-            <ul style="list-style:none; padding:0; margin:0;">
-            {% for lesson in lessons %}
-                <li style="padding:14px 0; border-bottom:1px solid var(--border-dark); display:flex; align-items:center; gap:12px;">
-                    <div style="width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem; font-weight:700; flex-shrink:0;">{{ forloop.counter }}</div>
-                    <a href="{% url 'lesson_detail' course.id lesson.id %}" style="color:#fff; text-decoration:none; font-weight:600; font-size:0.9rem;">{{ lesson.title }}</a>
-                </li>
-            {% empty %}
-                <li style="padding:20px 0; text-align:center; color:var(--text-muted);">No lessons added yet.</li>
-            {% endfor %}
-            </ul>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">
+                {{ course.category }} &middot; Last updated {{ course.created_at|date:"d M Y" }}
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+                <div style="background:var(--card-dark-alt); border-radius:10px; padding:8px 14px; text-align:center;">
+                    <div style="color:#fff; font-weight:700;">{{ course.enrollments.count }}</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">Students</div>
+                </div>
+                <div style="background:var(--card-dark-alt); border-radius:10px; padding:8px 14px; text-align:center;">
+                    <div style="color:#fff; font-weight:700;">{{ lessons|length }}</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">Lessons</div>
+                </div>
+                <div style="background:var(--card-dark-alt); border-radius:10px; padding:8px 14px; text-align:center;">
+                    <div style="color:#fff; font-weight:700;">{{ course.assignments.count }}</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">Assignments</div>
+                </div>
+                <div style="background:var(--card-dark-alt); border-radius:10px; padding:8px 14px; text-align:center;">
+                    <div style="color:#FBBF24; font-weight:700;">★ 4.9</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">Course Rating</div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:4px;">Course Completion</div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="progress-bar-track" style="flex:1; height:8px;">
+                        <div class="progress-bar-fill" style="width:84%; height:8px;"></div>
+                    </div>
+                    <span style="color:var(--purple-light); font-weight:700;">84%</span>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="stat-card mb-3" style="padding:20px;">
-            <h6 style="font-weight:700; color:#fff; margin-bottom:16px;">Course Info</h6>
-            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dark); font-size:0.85rem;">
-                <span style="color:var(--text-muted);">Instructor</span>
-                <span style="color:#fff; font-weight:600;">{{ course.instructor.username }}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dark); font-size:0.85rem;">
-                <span style="color:var(--text-muted);">Lessons</span>
-                <span style="color:#fff; font-weight:600;">{{ lessons|length }}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dark); font-size:0.85rem;">
-                <span style="color:var(--text-muted);">Students</span>
-                <span style="color:#fff; font-weight:600;">{{ course.enrollments.count }}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:10px 0; font-size:0.85rem;">
-                <span style="color:var(--text-muted);">Price</span>
-                <span style="color:var(--purple-light); font-weight:600;">KES {{ course.price }}</span>
-            </div>
+        <div class="col-md-3 text-end">
+            <div style="color:var(--purple-light); font-size:1.3rem; font-weight:800; margin-bottom:12px;">Price: KES {{ course.price }}</div>
+            {% if user == course.instructor %}
+                <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill d-inline-block mb-2" style="padding:8px 18px;">✏️ Edit Course</a>
+            {% elif user.is_authenticated and user.profile.role == 'student' %}
+                <a href="{% url 'enroll' course.id %}" class="btn-dark-pill d-inline-block mb-2" style="padding:8px 18px;">Enroll Now</a>
+                <br>
+                <a href="{% url 'send_message' course.instructor.id %}" class="btn-dark-pill d-inline-block" style="padding:8px 18px; background:var(--card-dark-alt);">Message Instructor</a>
+            {% elif user.is_authenticated and user.profile.role == 'instructor' %}
+                <p style="color:var(--text-muted); font-size:0.85rem;">Viewing another instructor's course.</p>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-dark-pill d-inline-block" style="padding:8px 18px;">Login to Enroll</a>
+            {% endif %}
         </div>
     </div>
 </div>
 
+<!-- Tabs -->
+<div style="display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--border-dark);">
+    <button onclick="showTab('lessons')" id="tab-lessons" style="background:none; border:none; color:#fff; padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid var(--purple-light); margin-bottom:-1px;">📖 Lessons</button>
+    <button onclick="showTab('overview')" id="tab-overview" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">📋 Overview</button>
+    <button onclick="showTab('assignments')" id="tab-assignments" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">📝 Assignments</button>
+    <button onclick="showTab('quizzes')" id="tab-quizzes" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">🧠 Quizzes</button>
+    <button onclick="showTab('students')" id="tab-students" style="background:none; border:none; color:var(--text-muted); padding:10px 16px; font-size:0.85rem; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;">👥 Students</button>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+
+        <!-- Lessons Tab -->
+        <div id="content-lessons">
+            {% if user == course.instructor %}
+            <div style="background:var(--card-dark-alt); border:1px dashed var(--purple); border-radius:14px; padding:14px; text-align:center; margin-bottom:16px; cursor:pointer;">
+                <a href="{% url 'add_lesson' course.id %}" style="color:var(--purple-light); text-decoration:none; font-size:0.88rem; font-weight:600;">
+                    <i class="bi bi-plus-lg me-2"></i>Add Lesson
+                </a>
+            </div>
+            {% endif %}
+
+            {% for lesson in lessons %}
+            <div class="course-row mb-2" style="padding:16px 20px;">
+                <div class="d-flex align-items-center" style="flex:1;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.85rem; margin-right:14px; flex-shrink:0;">
+                        {{ forloop.counter }}
+                    </div>
+                    <div>
+                        <div style="color:#fff; font-weight:600; font-size:0.9rem;">
+                            <a href="{% url 'lesson_detail' course.id lesson.id %}" style="color:#fff; text-decoration:none;">{{ lesson.title }}</a>
+                        </div>
+                        <small style="color:var(--text-muted);">
+                            {% if lesson.video_url %}Video Lesson{% else %}Reading Material{% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% if user == course.instructor %}
+                <span style="background:#34D39922; color:#34D399; font-size:0.72rem; padding:3px 10px; border-radius:20px;">Published</span>
+                {% endif %}
+                <a href="{% url 'lesson_detail' course.id lesson.id %}" style="color:var(--text-muted); margin-left:12px;"><i class="bi bi-eye"></i></a>
+            </div>
+            {% empty %}
+            <div class="stat-card text-center py-4">
+                <p style="color:var(--text-muted);">No lessons yet.</p>
+                {% if user == course.instructor %}
+                <a href="{% url 'add_lesson' course.id %}" class="btn-dark-pill">Add First Lesson</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="content-overview" style="display:none;">
+            <div class="stat-card" style="padding:24px;">
+                <h5 style="font-weight:700; color:#fff; margin-bottom:12px;">About this course</h5>
+                <p style="color:#ddd; line-height:1.7;">{{ course.description }}</p>
+                <hr style="border-color:var(--border-dark); margin:20px 0;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:4px;">Instructor</div>
+                        <div style="color:#fff; font-weight:600;">{{ course.instructor.username }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:4px;">Category</div>
+                        <div style="color:#fff; font-weight:600;">{{ course.category }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignments Tab -->
+        <div id="content-assignments" style="display:none;">
+            <div class="stat-card" style="padding:24px;">
+                <h5 style="font-weight:700; color:#fff; margin-bottom:16px;">Assignments</h5>
+                {% for assignment in course.assignments.all %}
+                <div class="course-row mb-2" style="padding:14px 16px;">
+                    <div class="d-flex align-items-center">
+                        <div class="course-icon me-3"><i class="bi bi-journal-check"></i></div>
+                        <div>
+                            <div style="color:#fff; font-weight:600;">{{ assignment.title }}</div>
+                            <small style="color:var(--text-muted);">Due {{ assignment.due_date|date:"d M Y" }}</small>
+                        </div>
+                    </div>
+                    {% if user.profile.role == 'student' %}
+                    <a href="{% url 'submit_assignment' assignment.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 14px;">Submit</a>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);">No assignments yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quizzes Tab -->
+        <div id="content-quizzes" style="display:none;">
+            <div class="stat-card" style="padding:24px;">
+                <h5 style="font-weight:700; color:#fff; margin-bottom:16px;">Quizzes</h5>
+                {% for quiz in course.quizzes.all %}
+                <div class="course-row mb-2" style="padding:14px 16px;">
+                    <div class="d-flex align-items-center">
+                        <div class="course-icon me-3"><i class="bi bi-patch-question-fill"></i></div>
+                        <div>
+                            <div style="color:#fff; font-weight:600;">{{ quiz.title }}</div>
+                            <small style="color:var(--text-muted);">{{ quiz.questions.count }} questions</small>
+                        </div>
+                    </div>
+                    {% if user.profile.role == 'student' %}
+                    <a href="{% url 'take_quiz' quiz.id %}" class="btn-dark-pill" style="font-size:0.8rem; padding:5px 14px;">Start</a>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);">No quizzes yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Students Tab -->
+        <div id="content-students" style="display:none;">
+            <div class="stat-card" style="padding:24px;">
+                <h5 style="font-weight:700; color:#fff; margin-bottom:16px;">Enrolled Students</h5>
+                {% for enrollment in course.course_enrollments.all %}
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-dark);">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.85rem;">
+                            {{ enrollment.student.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div style="color:#fff; font-weight:600; font-size:0.88rem;">{{ enrollment.student.username }}</div>
+                            <div style="color:var(--text-muted); font-size:0.75rem;">Enrolled {{ enrollment.enrolled_at|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="progress-bar-track" style="width:80px;">
+                            <div class="progress-bar-fill" style="width:{{ enrollment.progress }}%;"></div>
+                        </div>
+                        <span style="color:#fff; font-size:0.78rem;">{{ enrollment.progress }}%</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);">No students enrolled yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-md-4">
+
+        <!-- Quick Actions — instructor only -->
+        {% if user == course.instructor %}
+        <div class="stat-card mb-3" style="padding:20px;">
+            <h6 style="font-weight:700; color:#fff; margin-bottom:16px;">⚡ Quick Actions</h6>
+            <a href="{% url 'add_lesson' course.id %}" style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border-dark); text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px; color:#ddd; font-size:0.85rem;">
+                    <div style="width:28px; height:28px; border-radius:8px; background:#8B5CF622; display:flex; align-items:center; justify-content:center; font-size:0.85rem;">📖</div>
+                    Add Lesson
+                </div>
+                <i class="bi bi-chevron-right" style="color:var(--text-muted);"></i>
+            </a>
+            <a href="{% url 'assignments' %}" style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border-dark); text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px; color:#ddd; font-size:0.85rem;">
+                    <div style="width:28px; height:28px; border-radius:8px; background:#34D39922; display:flex; align-items:center; justify-content:center; font-size:0.85rem;">📝</div>
+                    Add Assignment
+                </div>
+                <i class="bi bi-chevron-right" style="color:var(--text-muted);"></i>
+            </a>
+            <a href="{% url 'quizzes' %}" style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border-dark); text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px; color:#ddd; font-size:0.85rem;">
+                    <div style="width:28px; height:28px; border-radius:8px; background:#F59E0B22; display:flex; align-items:center; justify-content:center; font-size:0.85rem;">🧠</div>
+                    Create Quiz
+                </div>
+                <i class="bi bi-chevron-right" style="color:var(--text-muted);"></i>
+            </a>
+            <a href="#" style="display:flex; align-items:center; justify-content:space-between; padding:11px 0; text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:10px; color:#ddd; font-size:0.85rem;">
+                    <div style="width:28px; height:28px; border-radius:8px; background:#EC489922; display:flex; align-items:center; justify-content:center; font-size:0.85rem;">📢</div>
+                    Announcement
+                </div>
+                <i class="bi bi-chevron-right" style="color:var(--text-muted);"></i>
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Course Progress -->
+        <div class="stat-card mb-3" style="padding:20px;">
+            <h6 style="font-weight:700; color:#fff; margin-bottom:16px;">Course Info</h6>
+            <div style="text-align:center; margin-bottom:16px;">
+                <div style="width:90px; height:90px; border-radius:50%; border:6px solid var(--purple); display:flex; align-items:center; justify-content:center; margin:0 auto; flex-direction:column;">
+                    <div style="font-size:1.2rem; font-weight:800; color:#fff;">84%</div>
+                    <div style="font-size:0.6rem; color:var(--text-muted);">Completed</div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-dark); font-size:0.82rem;">
+                <span style="color:var(--text-muted);">Lessons</span>
+                <span style="color:#fff;">{{ lessons|length }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-dark); font-size:0.82rem;">
+                <span style="color:var(--text-muted);">Assignments</span>
+                <span style="color:#fff;">{{ course.assignments.count }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-dark); font-size:0.82rem;">
+                <span style="color:var(--text-muted);">Quizzes</span>
+                <span style="color:#fff;">{{ course.quizzes.count }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-dark); font-size:0.82rem;">
+                <span style="color:var(--text-muted);">Students</span>
+                <span style="color:#fff;">{{ course.enrollments.count }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:0.82rem;">
+                <span style="color:var(--text-muted);">Instructor</span>
+                <span style="color:var(--purple-light); font-weight:600;">{{ course.instructor.username }}</span>
+            </div>
+        </div>
+
+        <!-- Recent Students -->
+        {% if user == course.instructor %}
+        <div class="stat-card" style="padding:20px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 style="font-weight:700; color:#fff; margin:0;">Recent Students</h6>
+                <span style="color:var(--purple-light); font-size:0.78rem; cursor:pointer;" onclick="showTab('students')">View All</span>
+            </div>
+            {% for enrollment in course.course_enrollments.all|slice:":3" %}
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-dark);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--purple-deep)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.78rem;">
+                        {{ enrollment.student.username|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <div style="color:#fff; font-size:0.82rem; font-weight:600;">{{ enrollment.student.username }}</div>
+                        <div style="color:var(--text-muted); font-size:0.72rem;">{{ enrollment.enrolled_at|timesince }} ago</div>
+                    </div>
+                </div>
+                <span style="color:var(--purple-light); font-size:0.78rem; font-weight:600;">{{ enrollment.progress }}%</span>
+            </div>
+            {% empty %}
+            <p style="color:var(--text-muted); font-size:0.82rem;">No students yet.</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
 {% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(name) {
+    const tabs = ['lessons','overview','assignments','quizzes','students'];
+    tabs.forEach(t => {
+        document.getElementById('content-' + t).style.display = 'none';
+        const btn = document.getElementById('tab-' + t);
+        if(btn) {
+            btn.style.color = 'var(--text-muted)';
+            btn.style.borderBottom = '2px solid transparent';
+        }
+    });
+    document.getElementById('content-' + name).style.display = 'block';
+    const active = document.getElementById('tab-' + name);
+    if(active) {
+        active.style.color = '#fff';
+        active.style.borderBottom = '2px solid var(--purple-light)';
+    }
+}
+</script>
+{% endblock %}
+
+
+
+
+
