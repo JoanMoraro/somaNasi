@@ -131,4 +131,20 @@ MPESA_CALLBACK_URL = config('MPESA_CALLBACK_URL')
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media'   
+
+import dj_database_url
+import os
+
+# Allow Railway and any other hosts
+ALLOWED_HOSTS = ['*']
+
+# WhiteNoise for static files
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Production database (Railway provides DATABASE_URL)
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.parse(os.environ.get('DATABASE_URL'))
+    
