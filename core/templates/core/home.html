@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -149,7 +150,7 @@
 <body>
 
 <nav class="navbar-landing">
-    <div class="brand">somaNasi<span class="dot">.</span></div>
+    <img src="{% static 'core/logo.png' %}" alt="somaNasi" style="width:50px; height:50px; object-fit:contain;">
     <div class="nav-links d-none d-md-block">
         <a href="#">Home</a>
         <a href="{% url 'course_list' %}">Courses</a>

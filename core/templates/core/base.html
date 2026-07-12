@@ -12,7 +12,7 @@
 <div class="d-flex">
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="brand">◆ somaNasi.</div>
+        <img src="{% static 'core/logo.png' %}" alt="somaNasi" style="width:60px; height:60px; object-fit:contain; margin-bottom:20px;">
 
         <div class="nav-section" style="width:100%;">
             <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
