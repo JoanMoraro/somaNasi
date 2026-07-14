@@ -28,5 +28,6 @@ urlpatterns = [
     path('earnings/', views.earnings, name='earnings'),
     path('reviews/', views.reviews, name='reviews'),
     path('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
+    
 ]
  
